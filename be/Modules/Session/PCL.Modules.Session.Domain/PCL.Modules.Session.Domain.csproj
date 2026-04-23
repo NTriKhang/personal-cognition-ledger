@@ -7,11 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="..\..\..\Common\Common.Domain\Common.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Common.Domain\Common.Domain.csproj" />
-  </ItemGroup>
 
 </Project>

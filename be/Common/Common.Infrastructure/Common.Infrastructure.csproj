@@ -25,12 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Common.Application">
-      <HintPath>..\Common.Application\bin\Debug\net9.0\Common.Application.dll</HintPath>
-    </Reference>
-    <Reference Include="Common.Domain">
-      <HintPath>..\Common.Domain\bin\Debug\net9.0\Common.Domain.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\Common.Application\Common.Application.csproj" />
   </ItemGroup>
 
 </Project>

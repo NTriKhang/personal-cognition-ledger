@@ -1,0 +1,25 @@
+﻿using Common.Domain;
+
+namespace PCL.Modules.Session.Domain.LSessions
+{
+    public static class LSessionErrors
+    {
+        public static Error NotFound(Guid lsessionId) =>
+            Error.NotFound("LSession.NotFound", $"The session with the identifier {lsessionId} was not found");
+
+        public static readonly Error AlreadyEnded =
+            Error.Problem(
+                "LSession.AlreadyEnded",
+                "The learning session has already been ended.");
+
+        public static readonly Error InvalidEndTime =
+            Error.Problem(
+                "LSession.InvalidEndTime",
+                "EndedAt cannot be before StartedAt.");
+
+        public static readonly Error InvalidActivityId =
+            Error.Problem(
+                "LSession.InvalidActivityId",
+                "ActivityId cannot be empty.");
+    }
+}

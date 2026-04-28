@@ -53,4 +53,4 @@ CodeCoverage/
 TestResult.xml
 nunit-*.xml
 
-be/PCL_API/.vs/PCL_API/*
+be/PCL_API/.vs/*

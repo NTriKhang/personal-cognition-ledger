@@ -14,7 +14,7 @@ namespace PCL.Modules.Session.Application.LSessions.GetLearningSession
     {
         public async Task<Result<LSessionDto>> Handle(GetLearningSessionQuery request, CancellationToken cancellationToken)
         {
-            var session = await repository.GetByIdAsync(request.Id);
+            var session = await repository.GetAsync(request.Id);
 
             if (session is null)
                 return Result.Failure<LSessionDto>(LSessionErrors.NotFound(request.Id));

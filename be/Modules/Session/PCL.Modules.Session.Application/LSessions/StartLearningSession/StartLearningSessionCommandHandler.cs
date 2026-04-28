@@ -12,14 +12,15 @@ namespace PCL.Modules.Session.Application.LSessions.StartLearningSession
 {
     public class StartLearningSessionCommandHandler(
         ILSessionRepository repository,
-        IUnitOfWork unitOfWork) : ICommandHandler<StartLearningSessionCommand, Guid>
+        IUnitOfWork unitOfWork) : ICommandHandler<StartLSessionCommand, Guid>
     {
 
-        public async Task<Result<Guid>> Handle(StartLearningSessionCommand request, CancellationToken cancellationToken)
+        public async Task<Result<Guid>> Handle(StartLSessionCommand request, CancellationToken cancellationToken)
         {
             LSession lSession = LSession.StartNew(request.StartedAt, request.ActivityIds);
 
-            await repository.AddAsync(lSession);
+            repository.AddAsync(lSession);
+            
             await unitOfWork.SaveChangesAsync();
 
             return Result.Success(lSession.Id);

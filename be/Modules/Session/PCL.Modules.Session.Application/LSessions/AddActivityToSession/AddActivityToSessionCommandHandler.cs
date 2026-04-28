@@ -16,7 +16,7 @@ namespace PCL.Modules.Session.Application.LSessions.AddActivityToSession
     {
         public async Task<Result> Handle(AddActivityToSessionCommand request, CancellationToken cancellationToken)
         {
-            LSession? session = await repository.GetByIdAsync(request.SessionId);
+            LSession? session = await repository.GetAsync(request.SessionId);
 
             if (session == null)
             {

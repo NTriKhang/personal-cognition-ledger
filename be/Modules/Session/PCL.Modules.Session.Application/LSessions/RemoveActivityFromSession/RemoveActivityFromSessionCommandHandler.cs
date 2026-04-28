@@ -15,7 +15,7 @@ namespace PCL.Modules.Session.Application.LSessions.RemoveActivityFromSession
     {
         public async Task<Result> Handle(RemoveActivityFromSessionCommand request, CancellationToken cancellationToken)
         {
-            var session = await repository.GetByIdAsync(request.SessionId);
+            var session = await repository.GetAsync(request.SessionId);
 
             if (session is null)
                 return Result.Failure<Guid>(LSessionErrors.NotFound(request.SessionId));

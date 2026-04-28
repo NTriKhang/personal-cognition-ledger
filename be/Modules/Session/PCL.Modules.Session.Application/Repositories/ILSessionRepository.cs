@@ -11,11 +11,8 @@ namespace PCL.Modules.Session.Application.Repositories
     /// </summary>
     public interface ILSessionRepository
     {
-        Task<LSession?> GetByIdAsync(Guid id);
-        Task AddAsync(LSession session);
-        Task UpdateAsync(LSession session);
-        Task DeleteAsync(Guid id);
-        Task<IEnumerable<LSession>> ListAsync();
+        Task<LSession?> GetAsync(Guid id);
+        void AddAsync(LSession session);
     }
 }
 

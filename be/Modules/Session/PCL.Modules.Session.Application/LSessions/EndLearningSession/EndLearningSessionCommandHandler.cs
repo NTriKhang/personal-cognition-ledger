@@ -11,11 +11,11 @@ namespace PCL.Modules.Session.Application.LSessions.EndLearningSession
     public class EndLearningSessionCommandHandler(
         ILSessionRepository repository,
         IUnitOfWork unitOfWork)
-        : ICommandHandler<EndLearningSessionCommand, Guid>
+        : ICommandHandler<EndLSessionCommand, Guid>
     {
-        public async Task<Result<Guid>> Handle(EndLearningSessionCommand request, CancellationToken cancellationToken)
+        public async Task<Result<Guid>> Handle(EndLSessionCommand request, CancellationToken cancellationToken)
         {
-            var session = await repository.GetByIdAsync(request.Id);
+            var session = await repository.GetAsync(request.Id);
 
             if (session is null)
                 return Result.Failure<Guid>(LSessionErrors.NotFound(request.Id));

@@ -22,19 +22,19 @@ public static class InfrastructureConfiguration
 {
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
-        Action<IRegistrationConfigurator>[] moduleConfigureConsumers,
-        string databaseConnectionString,
-        string redisConnectionString)
+        //Action<IRegistrationConfigurator>[] moduleConfigureConsumers,
+        string databaseConnectionString)
+        //string redisConnectionString)
     {
-        services.AddAuthenticationInternal();
+        //services.AddAuthenticationInternal();
 
-        services.AddAuthorizationInternal();
+        //services.AddAuthorizationInternal();
 
         services.TryAddSingleton<IDateTimeProvider, DateTimeProvider>();
 
-        services.TryAddSingleton<IEventBus, EventBus.EventBus>();
+        //services.TryAddSingleton<IEventBus, EventBus.EventBus>();
 
-        services.TryAddSingleton<InsertOutboxMessagesInterceptor>();
+        //services.TryAddSingleton<InsertOutboxMessagesInterceptor>();
 
         NpgsqlDataSource npgsqlDataSource = new NpgsqlDataSourceBuilder(databaseConnectionString).Build();
         services.TryAddSingleton(npgsqlDataSource);
@@ -43,39 +43,39 @@ public static class InfrastructureConfiguration
 
         SqlMapper.AddTypeHandler(new GenericArrayHandler<string>());
 
-        services.AddQuartz();
+        //services.AddQuartz();
 
-        services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
+        //services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
 
-        try
-        {
-            IConnectionMultiplexer connectionMultiplexer = ConnectionMultiplexer.Connect(redisConnectionString);
-            services.TryAddSingleton(connectionMultiplexer);
+        //try
+        //{
+        //    IConnectionMultiplexer connectionMultiplexer = ConnectionMultiplexer.Connect(redisConnectionString);
+        //    services.TryAddSingleton(connectionMultiplexer);
 
-            services.AddStackExchangeRedisCache(options =>
-                options.ConnectionMultiplexerFactory = () => Task.FromResult(connectionMultiplexer));
-        }
-        catch
-        {
+        //    services.AddStackExchangeRedisCache(options =>
+        //        options.ConnectionMultiplexerFactory = () => Task.FromResult(connectionMultiplexer));
+        //}
+        //catch
+        //{
             services.AddDistributedMemoryCache();
-        }
+        //}
 
         services.TryAddSingleton<ICacheService, CacheService>();
 
-        services.AddMassTransit(configure =>
-        {
-            foreach (Action<IRegistrationConfigurator> configureConsumers in moduleConfigureConsumers)
-            {
-                configureConsumers(configure);
-            }
+        //services.AddMassTransit(configure =>
+        //{
+        //    foreach (Action<IRegistrationConfigurator> configureConsumers in moduleConfigureConsumers)
+        //    {
+        //        configureConsumers(configure);
+        //    }
 
-            configure.SetKebabCaseEndpointNameFormatter();
+        //    configure.SetKebabCaseEndpointNameFormatter();
 
-            configure.UsingInMemory((context, cfg) =>
-            {
-                cfg.ConfigureEndpoints(context);
-            });
-        });
+        //    configure.UsingInMemory((context, cfg) =>
+        //    {
+        //        cfg.ConfigureEndpoints(context);
+        //    });
+        //});
 
         return services;
     }

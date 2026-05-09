@@ -21,14 +21,14 @@ namespace PCL.Modules.Session.Application.LSessions.ListLearningSessions
             await using DbConnection connection = await dbConnectionFactory.OpenConnectionAsync();
 
             const string sql =
-                $"""
+            $"""
              SELECT
-                 id AS {nameof(LSessionDto.Id)},
-                 code AS {nameof(LSessionDto.Code)},
-                 started_at AS {nameof(LSessionDto.StartedAt)},
-                 ended_at AS {nameof(LSessionDto.EndedAt)},
-                 status AS {nameof(LSessionDto.Status)}
-             FROM session.learning_sessions
+                 "Id" AS {nameof(LSessionDto.Id)},
+                 "Code" AS {nameof(LSessionDto.Code)},
+                 "StartedAt" AS {nameof(LSessionDto.StartedAt)},
+                 "EndedAt" AS {nameof(LSessionDto.EndedAt)},
+                 "Status" AS {nameof(LSessionDto.Status)}
+             FROM session.lsession
              """;
 
             List<LSessionDto> sessions =

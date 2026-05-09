@@ -1,23 +1,48 @@
-var builder = WebApplication.CreateBuilder(args);
+using Common.Application;
+using Common.Infrastructure;
+using Common.Infrastructure.Configuration;
+using Common.Presentation.Endpoints;
+using PCL.Modules.Session.Infrastructure;
+using PCL_API.Extensions;
+using System.Reflection;
+
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-var app = builder.Build();
+builder.Services.AddProblemDetails();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerDocumentation();
+
+Assembly[] moduleApplicationAssemblies = [
+    PCL.Modules.Session.Application.AssemblyReference.Assembly];
+
+builder.Services.AddApplication(moduleApplicationAssemblies);
+
+string databaseConnectionString = builder.Configuration.GetConnectionStringOrThrow("Database");
+
+builder.Services.AddInfrastructure(
+    databaseConnectionString);
+
+builder.Services.AddLSessionModule(builder.Configuration);
+
+WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
+
+    app.ApplyMigrations();
 }
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
-
-app.MapControllers();
+app.MapEndpoints();
+//app.UseAuthorization();
 
 app.Run();

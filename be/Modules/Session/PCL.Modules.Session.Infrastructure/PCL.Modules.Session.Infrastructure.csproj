@@ -12,4 +12,8 @@
     <ProjectReference Include="..\PCL.Modules.Session.Presentation\PCL.Modules.Session.Presentation.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Database\Migrations\" />
+  </ItemGroup>
+
 </Project>

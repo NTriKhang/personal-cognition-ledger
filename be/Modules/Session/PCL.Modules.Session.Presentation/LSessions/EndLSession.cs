@@ -14,7 +14,7 @@ namespace PCL.Modules.Session.Presentation.LSessions
     {
         public void MapEndpoint(IEndpointRouteBuilder app)
         {
-            app.MapPut("learningsessions/{id:guid}/end", async (Guid id, EndRequest request, ISender sender) =>
+            app.MapPut("lsessions/{id:guid}/end", async (Guid id, EndRequest request, ISender sender) =>
             {
                 var command = new EndLSessionCommand(id, request.EndedAt);
 
@@ -24,7 +24,7 @@ namespace PCL.Modules.Session.Presentation.LSessions
                     () => Results.Ok(),
                     ApiResults.Problem);
             })
-            .WithTags("LearningSessions");
+            .WithTags(Tags.LSessions);
         }
 
         internal sealed record EndRequest(DateTimeOffset EndedAt);

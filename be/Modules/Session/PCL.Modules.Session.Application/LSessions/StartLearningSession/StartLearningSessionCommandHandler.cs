@@ -17,11 +17,19 @@ namespace PCL.Modules.Session.Application.LSessions.StartLearningSession
 
         public async Task<Result<Guid>> Handle(StartLSessionCommand request, CancellationToken cancellationToken)
         {
-            LSession lSession = LSession.StartNew(request.StartedAt, request.ActivityIds);
+            Result<LSession> startResult = LSession.StartNew(request.Title, request.StartedAt, request.ActivityIds);
+
+            if (startResult.IsFailure)
+                return Result.Failure<Guid>(startResult.Error);
+
+            if (await repository.HasActiveSessionAsync(cancellationToken))
+                return Result.Failure<Guid>(LSessionErrors.ActiveSessionAlreadyExists);
+
+            LSession lSession = startResult.Value;
 
             repository.AddAsync(lSession);
             
-            await unitOfWork.SaveChangesAsync();
+            await unitOfWork.SaveChangesAsync(cancellationToken);
 
             return Result.Success(lSession.Id);
         }

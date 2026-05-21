@@ -15,12 +15,14 @@ namespace PCL.Modules.Session.Domain.LSessions
     {
         public Guid Id { get; private set; }
         public int Code { get; private set; }
+        public string Title { get; private set; } = string.Empty;
         public DateTimeOffset StartedAt { get; private set; }
         public DateTimeOffset? EndedAt { get; private set; }
         public SessionStatus Status { get; private set; }
 
-        private readonly List<Guid> _learningActivityIds = new();
-        public IReadOnlyList<Guid> LearningActivityIds => _learningActivityIds.AsReadOnly();
+        private readonly List<Guid> _taskIds = new();
+        // TODO: Review whether these ids represent planned learning tasks rather than executed activities.
+        public IReadOnlyList<Guid> TaskIds => _taskIds.AsReadOnly();
 
         // For ORM / serializer
         private LSession() { }
@@ -28,21 +30,27 @@ namespace PCL.Modules.Session.Domain.LSessions
         /// <summary>
         /// Factory to create a new LearningSession. Ensures StartedAt is provided and session starts Active.
         /// </summary>
-        public static LSession StartNew(DateTimeOffset startedAt, IEnumerable<Guid>? activityIds = null)
+        public static Result<LSession> StartNew(string title, DateTimeOffset startedAt, IEnumerable<Guid>? activityIds = null)
         {
+            if (string.IsNullOrWhiteSpace(title))
+                return Result.Failure<LSession>(LSessionErrors.InvalidTitle);
+
             var session = new LSession
             {
                 Id = Guid.NewGuid(),
+                Title = title.Trim(),
                 StartedAt = startedAt,
                 Status = SessionStatus.Active
             };
 
             if (activityIds != null)
             {
-                session._learningActivityIds.AddRange(activityIds);
+                session._taskIds.AddRange(activityIds);
             }
 
-            return session;
+            session.Raise(new LSessionStartedDomainEvent(session.Id, session.StartedAt));
+
+            return Result.Success(session);
         }
 
         /// <summary>
@@ -57,9 +65,9 @@ namespace PCL.Modules.Session.Domain.LSessions
                 return Result.Failure(LSessionErrors.InvalidEndTime);
 
             EndedAt = endedAt;
-            Status = SessionStatus.Completed;
+            Status = SessionStatus.Stopped;
 
-            Raise(new LSessionEndedDomainEvent(Id, endedAt));
+            Raise(new LSessionStoppedDomainEvent(Id, endedAt));
 
             return Result.Success();
         }
@@ -72,11 +80,14 @@ namespace PCL.Modules.Session.Domain.LSessions
         */
         public Result AddActivity(Guid activityId)
         {
+            if (Status != SessionStatus.Active)
+                return Result.Failure(LSessionErrors.NotActive);
+
             if (activityId == Guid.Empty)
                 return Result.Failure(LSessionErrors.InvalidActivityId);
 
-            if (!_learningActivityIds.Contains(activityId))
-                _learningActivityIds.Add(activityId);
+            if (!_taskIds.Contains(activityId))
+                _taskIds.Add(activityId);
 
             return Result.Success();
         }
@@ -89,7 +100,13 @@ namespace PCL.Modules.Session.Domain.LSessions
         */
         public Result RemoveActivity(Guid activityId)
         {
-            _learningActivityIds.Remove(activityId);
+            if (Status != SessionStatus.Active)
+                return Result.Failure(LSessionErrors.NotActive);
+
+            if (activityId == Guid.Empty)
+                return Result.Failure(LSessionErrors.InvalidActivityId);
+
+            _taskIds.Remove(activityId);
 
             return Result.Success();
         }

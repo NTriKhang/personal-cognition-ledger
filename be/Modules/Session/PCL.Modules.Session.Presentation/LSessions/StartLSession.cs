@@ -18,6 +18,7 @@ internal sealed class StartLearningSession : IEndpoint
         {
             var command = new StartLSessionCommand(
                 request.Id,
+                request.Title,
                 request.StartedAt,
                 request.ActivityIds);
 
@@ -32,6 +33,7 @@ internal sealed class StartLearningSession : IEndpoint
 
     internal sealed record StartRequest(
         Guid? Id,
+        string Title,
         DateTimeOffset StartedAt,
         IEnumerable<Guid>? ActivityIds);
 }

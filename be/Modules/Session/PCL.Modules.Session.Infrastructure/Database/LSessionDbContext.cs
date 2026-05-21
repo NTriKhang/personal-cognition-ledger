@@ -29,6 +29,7 @@ namespace PCL.Modules.Session.Infrastructure.Database
 
                 b.Property(e => e.StartedAt).IsRequired();
                 b.Property(e => e.EndedAt);
+                b.Property(e => e.Title).IsRequired();
 
                 b.Property(e => e.Code)
                         .HasDefaultValueSql($"nextval('\"{Schemas.Session}\".\"{Sequences.LSessionSq}\"')")
@@ -40,7 +41,7 @@ namespace PCL.Modules.Session.Infrastructure.Database
                     .IsRequired();
 
                 // Do not map the in-memory activity id collection to a column.
-                b.Ignore(e => e.LearningActivityIds);
+                b.Ignore(e => e.TaskIds);
             });
         }
     }

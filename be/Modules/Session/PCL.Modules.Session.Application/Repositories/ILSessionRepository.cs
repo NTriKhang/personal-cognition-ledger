@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using PCL.Modules.Session.Domain.LSessions;
 
@@ -12,6 +13,7 @@ namespace PCL.Modules.Session.Application.Repositories
     public interface ILSessionRepository
     {
         Task<LSession?> GetAsync(Guid id);
+        Task<bool> HasActiveSessionAsync(CancellationToken cancellationToken = default);
         void AddAsync(LSession session);
     }
 }

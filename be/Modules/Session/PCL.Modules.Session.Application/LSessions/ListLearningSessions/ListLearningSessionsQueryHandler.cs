@@ -25,6 +25,7 @@ namespace PCL.Modules.Session.Application.LSessions.ListLearningSessions
              SELECT
                  "Id" AS {nameof(LSessionDto.Id)},
                  "Code" AS {nameof(LSessionDto.Code)},
+                 "Title" AS {nameof(LSessionDto.Title)},
                  "StartedAt" AS {nameof(LSessionDto.StartedAt)},
                  "EndedAt" AS {nameof(LSessionDto.EndedAt)},
                  "Status" AS {nameof(LSessionDto.Status)}

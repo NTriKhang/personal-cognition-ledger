@@ -9,6 +9,7 @@ namespace PCL.Modules.Session.Application.LSessions.GetLearningSession
     {
         public Guid Id { get; init; }
         public int Code { get; init; }
+        public string Title { get; init; } = string.Empty;
         public DateTimeOffset StartedAt { get; init; }
         public DateTimeOffset? EndedAt { get; init; }
         public SessionStatus Status { get; init; }

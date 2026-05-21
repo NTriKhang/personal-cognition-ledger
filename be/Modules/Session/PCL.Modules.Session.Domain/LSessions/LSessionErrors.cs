@@ -12,10 +12,25 @@ namespace PCL.Modules.Session.Domain.LSessions
                 "LSession.AlreadyEnded",
                 "The learning session has already been ended.");
 
+        public static readonly Error InvalidTitle =
+            Error.Problem(
+                "LSession.InvalidTitle",
+                "The learning session title is required.");
+
+        public static readonly Error ActiveSessionAlreadyExists =
+            Error.Conflict(
+                "LSession.ActiveSessionAlreadyExists",
+                "Another active learning session already exists.");
+
         public static readonly Error InvalidEndTime =
             Error.Problem(
                 "LSession.InvalidEndTime",
                 "EndedAt cannot be before StartedAt.");
+
+        public static readonly Error NotActive =
+            Error.Problem(
+                "LSession.NotActive",
+                "The learning session is not active.");
 
         public static readonly Error InvalidActivityId =
             Error.Problem(

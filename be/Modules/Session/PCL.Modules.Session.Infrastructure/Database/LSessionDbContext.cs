@@ -27,6 +27,7 @@ namespace PCL.Modules.Session.Infrastructure.Database
                 b.ToTable("lsession");
                 b.HasKey(e => e.Id);
 
+                b.Property(e => e.OwnerId).IsRequired();
                 b.Property(e => e.StartedAt).IsRequired();
                 b.Property(e => e.EndedAt);
                 b.Property(e => e.Title).IsRequired();
@@ -39,6 +40,9 @@ namespace PCL.Modules.Session.Infrastructure.Database
                 b.Property(e => e.Status)
                     .HasConversion<string>()
                     .IsRequired();
+
+                b.HasIndex(e => e.OwnerId);
+                b.HasIndex(e => new { e.OwnerId, e.Status });
 
                 // Do not map the in-memory activity id collection to a column.
                 b.Ignore(e => e.TaskIds);

@@ -24,6 +24,7 @@ namespace PCL.Modules.Session.Application.LSessions.ListLearningSessions
             $"""
              SELECT
                  "Id" AS {nameof(LSessionDto.Id)},
+                 "OwnerId" AS {nameof(LSessionDto.OwnerId)},
                  "Code" AS {nameof(LSessionDto.Code)},
                  "Title" AS {nameof(LSessionDto.Title)},
                  "StartedAt" AS {nameof(LSessionDto.StartedAt)},

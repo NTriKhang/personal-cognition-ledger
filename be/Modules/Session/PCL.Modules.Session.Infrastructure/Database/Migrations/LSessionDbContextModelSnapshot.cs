@@ -40,6 +40,9 @@ namespace PCL.Modules.Session.Infrastructure.Database.Migrations
                     b.Property<DateTimeOffset?>("EndedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTimeOffset>("StartedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -52,6 +55,10 @@ namespace PCL.Modules.Session.Infrastructure.Database.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("OwnerId");
+
+                    b.HasIndex("OwnerId", "Status");
 
                     b.ToTable("lsession", "session");
                 });

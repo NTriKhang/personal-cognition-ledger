@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Modules\Session\PCL.Modules.Session.Infrastructure\PCL.Modules.Session.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\TaskPlanning\PCL.Modules.TaskPlanning.Infrastructure\PCL.Modules.TaskPlanning.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

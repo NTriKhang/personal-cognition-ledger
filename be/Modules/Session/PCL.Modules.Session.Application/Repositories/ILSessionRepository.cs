@@ -13,7 +13,7 @@ namespace PCL.Modules.Session.Application.Repositories
     public interface ILSessionRepository
     {
         Task<LSession?> GetAsync(Guid id);
-        Task<bool> HasActiveSessionAsync(CancellationToken cancellationToken = default);
+        Task<bool> HasActiveSessionAsync(Guid ownerId, CancellationToken cancellationToken = default);
         void AddAsync(LSession session);
     }
 }

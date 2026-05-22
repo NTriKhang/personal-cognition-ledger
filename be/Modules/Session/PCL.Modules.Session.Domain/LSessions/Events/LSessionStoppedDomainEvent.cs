@@ -1,6 +1,6 @@
 using Common.Domain;
 
-namespace PCL.Modules.Session.Domain.LSessions
+namespace PCL.Modules.Session.Domain.LSessions.Events
 {
     public sealed class LSessionStoppedDomainEvent(Guid sessionId, DateTimeOffset stoppedAt) : DomainEvent
     {

@@ -17,6 +17,11 @@ namespace PCL.Modules.Session.Domain.LSessions
                 "LSession.InvalidTitle",
                 "The learning session title is required.");
 
+        public static readonly Error InvalidOwnerId =
+            Error.Problem(
+                "LSession.InvalidOwnerId",
+                "OwnerId cannot be empty.");
+
         public static readonly Error ActiveSessionAlreadyExists =
             Error.Conflict(
                 "LSession.ActiveSessionAlreadyExists",

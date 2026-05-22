@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PCL.Modules.Session.Application.Repositories;
 using PCL.Modules.Session.Domain.LSessions;
-using PCL.Modules.Session.Domain.ValueObjects;
 using PCL.Modules.Session.Infrastructure.Database;
 
 namespace PCL.Modules.Session.Infrastructure.LSessions
@@ -18,10 +17,10 @@ namespace PCL.Modules.Session.Infrastructure.LSessions
             return await context.LSessions.SingleOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task<bool> HasActiveSessionAsync(CancellationToken cancellationToken = default)
+        public async Task<bool> HasActiveSessionAsync(Guid ownerId, CancellationToken cancellationToken = default)
         {
             return await context.LSessions.AnyAsync(
-                x => x.Status == SessionStatus.Active,
+                x => x.OwnerId == ownerId && x.Status == LSessionStatus.Active,
                 cancellationToken);
         }
     }

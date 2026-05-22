@@ -3,6 +3,7 @@ using Common.Infrastructure;
 using Common.Infrastructure.Configuration;
 using Common.Presentation.Endpoints;
 using PCL.Modules.Session.Infrastructure;
+using PCL.Modules.TaskPlanning.Infrastructure;
 using PCL_API.Extensions;
 using System.Reflection;
 
@@ -18,7 +19,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerDocumentation();
 
 Assembly[] moduleApplicationAssemblies = [
-    PCL.Modules.Session.Application.AssemblyReference.Assembly];
+    PCL.Modules.Session.Application.AssemblyReference.Assembly,
+    PCL.Modules.TaskPlanning.Application.AssemblyReference.Assembly];
 
 builder.Services.AddApplication(moduleApplicationAssemblies);
 
@@ -28,6 +30,7 @@ builder.Services.AddInfrastructure(
     databaseConnectionString);
 
 builder.Services.AddLSessionModule(builder.Configuration);
+builder.Services.AddTaskPlanningModule(builder.Configuration);
 
 WebApplication app = builder.Build();
 

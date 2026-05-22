@@ -1,56 +1,66 @@
-# Session Lifecycle — Personal Cognition Ledger
+# Session Lifecycle - Personal Cognition Ledger
 
 ## Purpose
 
 This document defines the lifecycle of a Session and the rules that govern its state transitions.
 
-This is the first source of truth for backend behavior.
+This is the first source of truth for backend Session behavior.
 
 ---
 
 ## Core Concept
 
-A Session represents a bounded period of focused activity.
+A Session represents a bounded period of focused execution.
 
-It moves through a defined set of states.
+It records what actually happened during a period of work.
+
+In V1, creating a Session means starting execution immediately.
+
+There is no Draft state in the current Session model.
+
+```text
+Task = intent
+Session = execution
+Evidence = proof
+Reflection = conclusion
+```
 
 ---
 
-## Session States
-
-### Draft
-
-A session that has been created but not started.
-
-- no start time
-- no activity yet
-
----
+## Current Lifecycle States
 
 ### Active
 
-A session that is currently running.
+A Session that is currently running.
 
-- start time is set
-- user is performing activities
-- tasks and evidence can be added
+Characteristics:
+
+- owner is known
+- title is set
+- StartedAt is set
+- EndedAt is not set
+- user may attach planned Task references
+- evidence may be added by downstream contexts
+- timeline facts may occur
+
+Active means execution is happening now.
 
 ---
 
 ### Stopped
 
-A session that has been ended.
+A Session that has ended.
 
-- end time is set
-- no further activity allowed (with some exceptions)
+Characteristics:
 
----
+- EndedAt is set
+- lifecycle is complete
+- core execution data should remain stable
+- replay and reflection can consume the Session as a stable fact
 
-### Archived (Optional, Future)
+Stopped does not mean every Task was completed.
 
-A session that is locked and no longer editable.
-
-Not required for V1.
+Stopped only means the execution period ended.
 
 ---
 
@@ -59,105 +69,193 @@ Not required for V1.
 ```mermaid
 flowchart LR
 
-Draft --> Active
+None --> Active
 Active --> Stopped
-Stopped --> Archived
 ```
 
-# Session Management Domain Model - Specification
+---
 
-## 1. Lifecycle States
-A Session follows a strict linear lifecycle.
+## State Transition Rules
 
-* **Draft**: The initial state upon creation. Configuration and preparation occurs here.
-* **Active**: The session is currently in progress. Real-time data collection occurs here.
-* **Stopped**: The session has concluded. Final analysis and reflections occur here.
+### Start Session
 
-## 2. State Transitions & Commands
+Initial state:
 
-### CreateSession
-* **Description**: Initializes a new session.
-* **Initial State**: None
-* **Resulting State**: `Draft`
-* **Domain Event**: `SessionCreated`
+- none
 
-### StartSession
-* **Description**: Commences the session tracking.
-* **Initial State**: `Draft`
-* **Resulting State**: `Active`
-* **Rules**:
-    * Cannot start if already `Active`.
-    * Cannot start if already `Stopped`.
-* **Effects**:
-    * Set `start_time` to current timestamp.
-    * Emit `SessionStarted`.
+Resulting state:
 
-### StopSession
-* **Description**: Ends the session tracking.
-* **Initial State**: `Active`
-* **Resulting State**: `Stopped`
-* **Rules**:
-    * Cannot stop if state is not `Active`.
-    * Cannot stop twice (terminal state).
-* **Effects**:
-    * Set `end_time` to current timestamp.
-    * Emit `SessionStopped`.
+- Active
 
-## 3. Permission Matrix (Allowed Actions)
+Rules:
 
-| Action | Draft | Active | Stopped |
-| :--- | :---: | :---: | :---: |
-| Assign Tasks | Yes | Yes | No |
-| Add Evidence | No | Yes | No* |
-| Add Annotation | No | Yes | No |
-| Reflection | No | No | Yes |
-| View Timeline | Yes | Yes | Yes |
-| Read Data | Yes | Yes | Yes |
+- OwnerId must be provided.
+- Title must be provided.
+- StartedAt must be provided.
+- A user may only have one Active Session at a time.
 
-*\*Optional Design Decision: Consider allowing late evidence in future versions.*
+Effects:
 
-## 4. Domain Rules & Invariants
+- create Session identity
+- assign readable Session Code
+- set OwnerId
+- set StartedAt
+- set Status to Active
+- emit `LSessionStartedDomainEvent`
+
+Important:
+
+The one-active-session rule requires checking other Sessions.  
+It belongs in the application layer or repository-backed validation, not inside the Session aggregate alone.
+
+---
+
+### Stop Session
+
+Initial state:
+
+- Active
+
+Resulting state:
+
+- Stopped
+
+Rules:
+
+- Session must be Active.
+- Session can only be stopped once.
+- EndedAt must not be earlier than StartedAt.
+
+Effects:
+
+- set EndedAt
+- set Status to Stopped
+- emit `LSessionStoppedDomainEvent`
+
+---
+
+## Allowed Operations Per State
+
+| Operation | Active | Stopped |
+| :--- | :---: | :---: |
+| Attach Task reference | Yes | No |
+| Remove Task reference | Yes | No |
+| Add Evidence | Yes | No |
+| Add Annotation | Yes | No |
+| Stop Session | Yes | No |
+| Submit Reflection | No | Yes |
+| View Timeline | Yes | Yes |
+| Read Session | Yes | Yes |
+
+Notes:
+
+- Task assignment records intention inside execution.
+- Evidence records proof of what happened.
+- Reflection happens after execution ends.
+- Future correction workflows must be explicit and auditable.
+
+---
+
+## Business Constraints And Invariants
+
+### Ownership Rules
+
+- Every Session belongs to one owner.
+- OwnerId is required when starting a Session.
+- Active Session uniqueness is scoped per owner.
+
+---
 
 ### Time Rules
-* **Start Time**: Must be set exactly once when transitioning to `Active`. Immutable thereafter.
-* **End Time**: Must be set when transitioning to `Stopped`.
-* **Chronology**: `end_time` must be chronologically after `start_time`.
 
-### Invariants
-* A session cannot be `Active` without a `start_time`.
-* A session cannot be `Stopped` without an `end_time`.
-* A session cannot be simultaneously `Active` and `Stopped`.
-* Evidence/Annotations must always reference a valid, existing session.
+- StartedAt is set exactly once when the Session is created.
+- EndedAt is set exactly once when the Session is stopped.
+- EndedAt cannot be earlier than StartedAt.
 
-### Entity Rules
-* **Tasks**: A session may have multiple tasks. Tasks can be added in `Draft` or `Active` states.
-* **Evidence**: Strict Mode - Evidence can only be added while the session is `Active`.
-* **Annotations**: Must reference an existing evidence item; cannot exist in isolation.
-* **Reflections**: Can only be submitted once the session is `Stopped`. (V1 supports 1+ reflections per session).
+---
 
-## 5. Event Catalog
+### State Rules
 
-### Core Lifecycle Events
-* `SessionCreated`
-* `SessionStarted`
-* `SessionStopped`
+- A Session has exactly one lifecycle state at a time.
+- A Session cannot be Active without StartedAt.
+- A Session cannot be Stopped without EndedAt.
+- A Stopped Session cannot become Active again.
+- A Stopped Session cannot be stopped again.
 
-### Associated Context Events
-* `TaskAttachedToSession`
-* `EvidenceItemAdded`
-* `AnnotationCreated`
-* `ReflectionSubmitted`
+---
 
-## 6. Design Scope (V1)
+### Task Rules
 
-### Included (Strict)
-* Linear transition: Draft → Active → Stopped.
-* Immutable start/end times once set.
-* Strict evidence capture window (Active only).
+- A Session may reference multiple Tasks.
+- A Task represents intent, not execution.
+- Stopping a Session must not automatically complete Tasks.
+- Completing a Task must not automatically stop a Session.
 
-### Excluded (Future Extensions)
-* **No Pause/Resume**: Sessions are continuous.
-* **No Re-starting**: Once stopped, a session remains stopped.
-* **No Merging/Splitting**: Sessions are atomic units.
-* **No Background Tracking**: Manual start/stop triggers only.
-* **No Templates**: Sessions are created from scratch.
+---
+
+### Evidence Rules
+
+- Evidence may be attached while the Session is Active.
+- Evidence belongs to downstream Evidence / Artifact behavior.
+- Session should not own file storage or evidence processing.
+
+---
+
+## Domain Events
+
+Core lifecycle events:
+
+- `LSessionStartedDomainEvent`
+- `LSessionStoppedDomainEvent`
+
+Associated context events may include:
+
+- `TaskAttachedToSession`
+- `EvidenceItemAdded`
+- `AnnotationCreated`
+- `ReflectionSubmitted`
+
+Replay and Reflection may consume these events.
+
+They must remain downstream and derived.
+
+---
+
+## Design Scope V1
+
+### Included
+
+- immediate Session start on creation
+- lifecycle transition: Active -> Stopped
+- owner-scoped active Session validation
+- immutable start and end timestamps
+- readable numeric Session Code
+- Task references as intention links
+
+---
+
+### Excluded
+
+- Draft Session
+- Pause / Resume
+- Restarting Stopped Sessions
+- automatic Task completion
+- Session templates
+- workflow approval states
+- AI-generated lifecycle decisions
+
+---
+
+## Final Recommendation
+
+Keep Session:
+
+- small
+- owner-scoped
+- execution-focused
+- lifecycle-explicit
+- separate from Task planning
+
+Task supplies intent.  
+Session records execution.
+

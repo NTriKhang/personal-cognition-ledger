@@ -1,5 +1,5 @@
 using Common.Domain;
-using PCL.Modules.Session.Domain.ValueObjects;
+using PCL.Modules.Session.Domain.LSessions.Events;
 
 namespace PCL.Modules.Session.Domain.LSessions
 {
@@ -14,11 +14,12 @@ namespace PCL.Modules.Session.Domain.LSessions
     public class LSession : Entity
     {
         public Guid Id { get; private set; }
+        public Guid OwnerId { get; private set; }
         public int Code { get; private set; }
         public string Title { get; private set; } = string.Empty;
         public DateTimeOffset StartedAt { get; private set; }
         public DateTimeOffset? EndedAt { get; private set; }
-        public SessionStatus Status { get; private set; }
+        public LSessionStatus Status { get; private set; }
 
         private readonly List<Guid> _taskIds = new();
         // TODO: Review whether these ids represent planned learning tasks rather than executed activities.
@@ -30,17 +31,21 @@ namespace PCL.Modules.Session.Domain.LSessions
         /// <summary>
         /// Factory to create a new LearningSession. Ensures StartedAt is provided and session starts Active.
         /// </summary>
-        public static Result<LSession> StartNew(string title, DateTimeOffset startedAt, IEnumerable<Guid>? activityIds = null)
+        public static Result<LSession> StartNew(Guid ownerId, string title, DateTimeOffset startedAt, IEnumerable<Guid>? activityIds = null)
         {
+            if (ownerId == Guid.Empty)
+                return Result.Failure<LSession>(LSessionErrors.InvalidOwnerId);
+
             if (string.IsNullOrWhiteSpace(title))
                 return Result.Failure<LSession>(LSessionErrors.InvalidTitle);
 
             var session = new LSession
             {
                 Id = Guid.NewGuid(),
+                OwnerId = ownerId,
                 Title = title.Trim(),
                 StartedAt = startedAt,
-                Status = SessionStatus.Active
+                Status = LSessionStatus.Active
             };
 
             if (activityIds != null)
@@ -65,7 +70,7 @@ namespace PCL.Modules.Session.Domain.LSessions
                 return Result.Failure(LSessionErrors.InvalidEndTime);
 
             EndedAt = endedAt;
-            Status = SessionStatus.Stopped;
+            Status = LSessionStatus.Stopped;
 
             Raise(new LSessionStoppedDomainEvent(Id, endedAt));
 
@@ -80,7 +85,7 @@ namespace PCL.Modules.Session.Domain.LSessions
         */
         public Result AddActivity(Guid activityId)
         {
-            if (Status != SessionStatus.Active)
+            if (Status != LSessionStatus.Active)
                 return Result.Failure(LSessionErrors.NotActive);
 
             if (activityId == Guid.Empty)
@@ -100,7 +105,7 @@ namespace PCL.Modules.Session.Domain.LSessions
         */
         public Result RemoveActivity(Guid activityId)
         {
-            if (Status != SessionStatus.Active)
+            if (Status != LSessionStatus.Active)
                 return Result.Failure(LSessionErrors.NotActive);
 
             if (activityId == Guid.Empty)

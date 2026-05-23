@@ -43,9 +43,9 @@ public static class InfrastructureConfiguration
 
         SqlMapper.AddTypeHandler(new GenericArrayHandler<string>());
 
-        //services.AddQuartz();
+        services.AddQuartz();
 
-        //services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
+        services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
 
         //try
         //{

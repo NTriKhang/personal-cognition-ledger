@@ -259,6 +259,7 @@ Recommended invariants:
 - CancelledAt is set exactly once
 - completion does not affect Session lifecycle
 - cancellation does not delete Session history
+- lifecycle rules stay inside the domain model, not only in command handlers or validators
 
 Recommended domain events:
 
@@ -282,6 +283,7 @@ The Task aggregate can be tested without database or API concerns.
 - infrastructure attributes inside domain classes
 - using Session state as Task state
 - completing Tasks automatically from Session stop
+- introducing a generic lifecycle framework before Task rules justify it
 
 ---
 
@@ -380,10 +382,14 @@ Validation should cover:
 - title length
 - valid category
 - valid priority
-- required cancellation reason when cancelling from Active
+- request-level cancellation reason shape
 - valid owner access
 
 Validation should not duplicate aggregate lifecycle rules.
+
+If Active cancellation requires a reason, the aggregate should enforce that invariant.
+
+The application layer may fail fast for request quality, but the domain must remain the final authority.
 
 ### Expected Outcome
 
@@ -777,6 +783,82 @@ The Task aggregate should contain:
 - domain events
 - lifecycle behavior methods
 
+## Lifecycle Rule Architecture
+
+V1 can keep lifecycle behavior directly inside the `Task` aggregate while the state space is small.
+
+The aggregate should still be written with future extraction in mind:
+
+- status checks should remain centralized inside aggregate behavior methods
+- application handlers should not decide whether lifecycle transitions are allowed
+- validators may check request shape, but not replace aggregate invariants
+- repeated rules should be extracted before they spread across methods
+- status-specific behavior should be promoted to explicit domain concepts when it becomes non-trivial
+
+The current preferred evolution path is:
+
+```text
+Simple aggregate methods
+  -> centralized lifecycle guard or transition helper
+  -> named policies/specifications for reusable rules
+  -> State Pattern only when statuses gain substantial behavior
+```
+
+Do not introduce many state classes immediately just because the lifecycle may grow.
+
+Use extraction pressure as the trigger:
+
+- new statuses require changes across many aggregate methods
+- terminal-state checks are repeated in many places
+- transition rules require multiple conditions, not only current status
+- each status starts to own different behavior for the same operation
+- application handlers begin checking `TaskStatus` to enforce business rules
+- tests become hard to read because valid behavior is scattered
+
+When those signs appear, prefer the State Pattern as the target architecture.
+
+Conceptually:
+
+```text
+Task aggregate
+  owns identity, persisted data, mutation methods, invariant boundary, and events
+
+TaskStatus
+  remains the durable persisted lifecycle value
+
+Task state objects
+  describe allowed behavior for Draft, Planned, Active, Completed, Cancelled, etc.
+
+Policies/specifications
+  describe reusable rules that are not themselves lifecycle states
+```
+
+The aggregate should continue exposing business methods such as `Plan`, `Activate`, `Complete`, and `Cancel`.
+
+External callers should not invoke state objects directly.
+
+State objects, if introduced later, are internal implementation details used by the aggregate to keep lifecycle logic cohesive.
+
+## Pattern Guidance
+
+Use these patterns deliberately:
+
+- **State Pattern**: best fit when lifecycle behavior differs significantly by status and transitions become complex.
+- **Policy-based design**: useful for named business rules such as cancellation requirements, completion eligibility, or assignment eligibility.
+- **Specification Pattern**: useful when a boolean rule must be reused, composed, or tested independently.
+- **Domain Service**: useful only when a rule requires coordination across aggregates, such as Task and Session assignment.
+- **Strategy Pattern**: useful for interchangeable algorithms, but not the primary pattern for lifecycle transitions.
+
+The main rule:
+
+```text
+Task lifecycle invariants must remain protected by the domain layer.
+```
+
+Application handlers may orchestrate loading, ownership checks, transactions, and persistence.
+
+They should not become the place where Task lifecycle decisions live.
+
 ## Outside Task Aggregate
 
 Keep these outside:
@@ -800,6 +882,7 @@ Examples:
 - terminal Tasks cannot be changed
 - completion timestamp is set once
 - cancellation timestamp is set once
+- active-task cancellation requirements are enforced consistently
 
 Session assignment requires coordination across Task and Session.
 
@@ -1194,4 +1277,3 @@ Keep it boring and durable:
 Do not let Task become execution tracking.
 
 Session remains the source of truth for what actually happened.
-

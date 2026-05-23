@@ -42,6 +42,11 @@ namespace PCL.Modules.Session.Infrastructure
 
             services.AddScoped<ILSessionRepository, LSessionRepository>();
             services.AddAutoMapper((sp, cfg) => { }, Session.Application.AssemblyReference.Assembly);
+
+            services.AddOutboxProcessor(
+                moduleName: "Session",
+                configuration.GetSection("Outbox:Session"));
+
         }
     }
 }

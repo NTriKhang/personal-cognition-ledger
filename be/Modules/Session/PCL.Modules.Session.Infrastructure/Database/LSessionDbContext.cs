@@ -1,16 +1,18 @@
+using Common.Infrastructure.Outbox;
 using Microsoft.EntityFrameworkCore;
 using PCL.Modules.Session.Application.Abstractions.Data;
 using PCL.Modules.Session.Domain.LSessions;
+using PCL.Modules.Session.Infrastructure.LSessions;
 
 namespace PCL.Modules.Session.Infrastructure.Database
 {
     /// <summary>
     /// EF Core DbContext for LearningSession service.
-    /// The domain keeps the activity ids as an internal collection; we do not map it to a dedicated column here.
     /// </summary>
     public class LSessionDbContext(DbContextOptions<LSessionDbContext> options) : DbContext(options), IUnitOfWork
     {
         public DbSet<LSession> LSessions { get; set; } = null!;
+        public DbSet<SessionTaskAssignment> SessionTaskAssignments { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -18,35 +20,11 @@ namespace PCL.Modules.Session.Infrastructure.Database
 
             modelBuilder.HasDefaultSchema(Schemas.Session);
 
-            modelBuilder.HasSequence<int>(Sequences.LSessionSq, schema: Schemas.Session)
-                .StartsAt(1)
-                .IncrementsBy(2);
+            LSessionConfiguration.ConfigureSequence(modelBuilder);
 
-            modelBuilder.Entity<LSession>(b =>
-            {
-                b.ToTable("lsession");
-                b.HasKey(e => e.Id);
-
-                b.Property(e => e.OwnerId).IsRequired();
-                b.Property(e => e.StartedAt).IsRequired();
-                b.Property(e => e.EndedAt);
-                b.Property(e => e.Title).IsRequired();
-
-                b.Property(e => e.Code)
-                        .HasDefaultValueSql($"nextval('\"{Schemas.Session}\".\"{Sequences.LSessionSq}\"')")
-                        .ValueGeneratedOnAdd();
-
-                // store enum as string
-                b.Property(e => e.Status)
-                    .HasConversion<string>()
-                    .IsRequired();
-
-                b.HasIndex(e => e.OwnerId);
-                b.HasIndex(e => new { e.OwnerId, e.Status });
-
-                // Do not map the in-memory activity id collection to a column.
-                b.Ignore(e => e.TaskIds);
-            });
+            modelBuilder.ApplyConfiguration(new LSessionConfiguration());
+            modelBuilder.ApplyConfiguration(new SessionTaskAssignmentConfiguration());
+            modelBuilder.ApplyConfiguration(new OutboxMessageConfiguration());
         }
     }
 }

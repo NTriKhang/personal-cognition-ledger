@@ -9,7 +9,7 @@ namespace PCL.Modules.Session.Application.LSessions.Mappings
         public LearningSessionProfile()
         {
             CreateMap<LSession, LSessionDto>()
-                .ForMember(dest => dest.LearningActivityIds, opt => opt.MapFrom(src => src.TaskIds));
+                .ForMember(dest => dest.AssignedTaskIds, opt => opt.MapFrom(src => src.AssignedTaskIds));
         }
     }
 }

@@ -17,7 +17,7 @@ namespace PCL.Modules.Session.Application.LSessions.StartLearningSession
 
         public async Task<Result<Guid>> Handle(StartLSessionCommand request, CancellationToken cancellationToken)
         {
-            Result<LSession> startResult = LSession.StartNew(request.OwnerId, request.Title, request.StartedAt, request.ActivityIds);
+            Result<LSession> startResult = LSession.StartNew(request.OwnerId, request.Title, request.StartedAt, request.AssignedTaskIds);
 
             if (startResult.IsFailure)
                 return Result.Failure<Guid>(startResult.Error);

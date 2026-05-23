@@ -9,7 +9,7 @@ namespace PCL.Modules.Session.Domain.LSessions
     /// - Must have StartedAt
     /// - Starts in Active state
     /// - Can be Ended only once
-    /// - Contains zero or more LearningActivities (stored as ids)
+    /// - Contains zero or more assigned Tasks (stored as ids)
     /// </summary>
     public class LSession : Entity
     {
@@ -21,9 +21,8 @@ namespace PCL.Modules.Session.Domain.LSessions
         public DateTimeOffset? EndedAt { get; private set; }
         public LSessionStatus Status { get; private set; }
 
-        private readonly List<Guid> _taskIds = new();
-        // TODO: Review whether these ids represent planned learning tasks rather than executed activities.
-        public IReadOnlyList<Guid> TaskIds => _taskIds.AsReadOnly();
+        private readonly List<SessionTaskAssignment> _taskAssignments = [];
+        public IReadOnlyList<Guid> AssignedTaskIds => _taskAssignments.Select(assignment => assignment.TaskId).ToList();
 
         // For ORM / serializer
         private LSession() { }
@@ -31,7 +30,7 @@ namespace PCL.Modules.Session.Domain.LSessions
         /// <summary>
         /// Factory to create a new LearningSession. Ensures StartedAt is provided and session starts Active.
         /// </summary>
-        public static Result<LSession> StartNew(Guid ownerId, string title, DateTimeOffset startedAt, IEnumerable<Guid>? activityIds = null)
+        public static Result<LSession> StartNew(Guid ownerId, string title, DateTimeOffset startedAt, IEnumerable<Guid>? assignedTaskIds = null)
         {
             if (ownerId == Guid.Empty)
                 return Result.Failure<LSession>(LSessionErrors.InvalidOwnerId);
@@ -48,9 +47,17 @@ namespace PCL.Modules.Session.Domain.LSessions
                 Status = LSessionStatus.Active
             };
 
-            if (activityIds != null)
+            if (assignedTaskIds != null)
             {
-                session._taskIds.AddRange(activityIds);
+                foreach (Guid taskId in assignedTaskIds.Distinct())
+                {
+                    Result assignResult = session.AssignTask(taskId, startedAt);
+
+                    if (assignResult.IsFailure)
+                    {
+                        return Result.Failure<LSession>(assignResult.Error);
+                    }
+                }
             }
 
             session.Raise(new LSessionStartedDomainEvent(session.Id, session.StartedAt));
@@ -78,40 +85,45 @@ namespace PCL.Modules.Session.Domain.LSessions
         }
 
         /**
-        * Adds an activity to the session if it is valid and not already present.
+        * Assigns a task to the session if it is valid and not already present.
         *
-        * @param activityId
+        * @param taskId
         * @return result indicating success or failure
         */
-        public Result AddActivity(Guid activityId)
+        public Result AssignTask(Guid taskId, DateTimeOffset assignedAt)
         {
             if (Status != LSessionStatus.Active)
                 return Result.Failure(LSessionErrors.NotActive);
 
-            if (activityId == Guid.Empty)
-                return Result.Failure(LSessionErrors.InvalidActivityId);
+            if (taskId == Guid.Empty)
+                return Result.Failure(LSessionErrors.InvalidTaskId);
 
-            if (!_taskIds.Contains(activityId))
-                _taskIds.Add(activityId);
+            if (_taskAssignments.All(assignment => assignment.TaskId != taskId))
+                _taskAssignments.Add(SessionTaskAssignment.Create(Id, taskId, assignedAt));
 
             return Result.Success();
         }
 
         /**
-        * Removes an activity from the session if it exists.
+        * Removes a task assignment from the session if it exists.
         *
-        * @param activityId
+        * @param taskId
         * @return result indicating success
         */
-        public Result RemoveActivity(Guid activityId)
+        public Result RemoveAssignedTask(Guid taskId)
         {
             if (Status != LSessionStatus.Active)
                 return Result.Failure(LSessionErrors.NotActive);
 
-            if (activityId == Guid.Empty)
-                return Result.Failure(LSessionErrors.InvalidActivityId);
+            if (taskId == Guid.Empty)
+                return Result.Failure(LSessionErrors.InvalidTaskId);
 
-            _taskIds.Remove(activityId);
+            SessionTaskAssignment? assignment = _taskAssignments.SingleOrDefault(x => x.TaskId == taskId);
+
+            if (assignment is not null)
+            {
+                _taskAssignments.Remove(assignment);
+            }
 
             return Result.Success();
         }

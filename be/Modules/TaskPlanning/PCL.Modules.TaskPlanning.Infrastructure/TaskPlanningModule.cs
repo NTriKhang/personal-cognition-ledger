@@ -33,6 +33,8 @@ namespace PCL.Modules.TaskPlanning.Infrastructure
             services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<TaskPlanningDbContext>());
 
             services.AddScoped<ITaskRepository, TaskRepository>();
+
+
         }
     }
 }

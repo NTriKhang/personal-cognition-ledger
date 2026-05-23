@@ -35,8 +35,8 @@ namespace PCL.Modules.Session.Infrastructure
                 .UseNpgsql(
                     configuration.GetConnectionString("Database"),
                     npgsqlOptions => npgsqlOptions
-                        .MigrationsHistoryTable(HistoryRepository.DefaultTableName, Schemas.Session)));
-                //.AddInterceptors(sp.GetRequiredService<InsertOutboxMessagesInterceptor>()));
+                        .MigrationsHistoryTable(HistoryRepository.DefaultTableName, Schemas.Session))
+                .AddInterceptors(sp.GetRequiredService<InsertOutboxMessagesInterceptor>()));
 
             services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<LSessionDbContext>());
 

@@ -14,7 +14,7 @@ namespace PCL.Modules.Session.Application.LSessions.GetLearningSession
         public DateTimeOffset StartedAt { get; init; }
         public DateTimeOffset? EndedAt { get; init; }
         public LSessionStatus Status { get; init; }
-        public IReadOnlyList<Guid> LearningActivityIds { get; init; } = Array.Empty<Guid>();
+        public IReadOnlyList<Guid> AssignedTaskIds { get; set; } = Array.Empty<Guid>();
 
         // Mapping is handled via AutoMapper profile instead of a manual factory.
     }

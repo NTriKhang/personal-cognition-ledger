@@ -34,7 +34,7 @@ public static class InfrastructureConfiguration
 
         //services.TryAddSingleton<IEventBus, EventBus.EventBus>();
 
-        //services.TryAddSingleton<InsertOutboxMessagesInterceptor>();
+        services.TryAddSingleton<InsertOutboxMessagesInterceptor>();
 
         NpgsqlDataSource npgsqlDataSource = new NpgsqlDataSourceBuilder(databaseConnectionString).Build();
         services.TryAddSingleton(npgsqlDataSource);

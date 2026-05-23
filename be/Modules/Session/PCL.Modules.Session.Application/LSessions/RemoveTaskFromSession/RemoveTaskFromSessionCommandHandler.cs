@@ -6,23 +6,28 @@ using PCL.Modules.Session.Domain.LSessions;
 using PCL.Modules.Session.Application.Repositories;
 using PCL.Modules.Session.Application.Abstractions.Data;
 
-namespace PCL.Modules.Session.Application.LSessions.RemoveActivityFromSession
+namespace PCL.Modules.Session.Application.LSessions.RemoveTaskFromSession
 {
-    public class RemoveActivityFromSessionCommandHandler(
+    public class RemoveTaskFromSessionCommandHandler(
         ILSessionRepository repository,
         IUnitOfWork unitOfWork)
-        : ICommandHandler<RemoveActivityFromSessionCommand>
+        : ICommandHandler<RemoveTaskFromSessionCommand>
     {
-        public async Task<Result> Handle(RemoveActivityFromSessionCommand request, CancellationToken cancellationToken)
+        public async Task<Result> Handle(RemoveTaskFromSessionCommand request, CancellationToken cancellationToken)
         {
             var session = await repository.GetAsync(request.SessionId);
 
             if (session is null)
                 return Result.Failure<Guid>(LSessionErrors.NotFound(request.SessionId));
 
-            session.RemoveActivity(request.ActivityId);
+            Result removeResult = session.RemoveAssignedTask(request.TaskId);
 
-            await unitOfWork.SaveChangesAsync();
+            if (removeResult.IsFailure)
+            {
+                return removeResult;
+            }
+
+            await unitOfWork.SaveChangesAsync(cancellationToken);
 
             return Result.Success(session.Id);
         }

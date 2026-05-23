@@ -1,20 +1,18 @@
 using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
 using PCL.Modules.Session.Domain.LSessions;
 using Common.Application.Messaging;
 using Common.Domain;
-using System.Data.Common;
 using PCL.Modules.Session.Application.Repositories;
 using PCL.Modules.Session.Application.Abstractions.Data;
 
-namespace PCL.Modules.Session.Application.LSessions.AddActivityToSession
+namespace PCL.Modules.Session.Application.LSessions.AssignTaskToSession
 {
-    sealed class AddActivityToSessionCommandHandler(
+    sealed class AssignTaskToSessionCommandHandler(
         ILSessionRepository repository,
-        IUnitOfWork unitOfWork) : ICommandHandler<AddActivityToSessionCommand>
+        IUnitOfWork unitOfWork) : ICommandHandler<AssignTaskToSessionCommand>
     {
-        public async Task<Result> Handle(AddActivityToSessionCommand request, CancellationToken cancellationToken)
+        public async Task<Result> Handle(AssignTaskToSessionCommand request, CancellationToken cancellationToken)
         {
             LSession? session = await repository.GetAsync(request.SessionId);
 
@@ -23,7 +21,12 @@ namespace PCL.Modules.Session.Application.LSessions.AddActivityToSession
                 return Result.Failure(LSessionErrors.NotFound(request.SessionId));
             }
 
-            session.AddActivity(request.ActivityId);
+            Result assignResult = session.AssignTask(request.TaskId, request.AssignedAt);
+
+            if (assignResult.IsFailure)
+            {
+                return assignResult;
+            }
 
             await unitOfWork.SaveChangesAsync(cancellationToken);
 

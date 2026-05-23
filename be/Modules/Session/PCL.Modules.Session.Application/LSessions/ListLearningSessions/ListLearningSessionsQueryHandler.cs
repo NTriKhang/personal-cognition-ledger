@@ -36,7 +36,46 @@ namespace PCL.Modules.Session.Application.LSessions.ListLearningSessions
             List<LSessionDto> sessions =
                 (await connection.QueryAsync<LSessionDto>(sql)).AsList();
 
+            if (sessions.Count == 0)
+            {
+                return Result.Success<IReadOnlyCollection<LSessionDto>>(sessions);
+            }
+
+            const string assignmentSql =
+            """
+            SELECT
+                "SessionId",
+                "TaskId"
+            FROM session.session_task_assignments
+            WHERE "SessionId" = ANY(@SessionIds)
+            """;
+
+            IEnumerable<SessionTaskAssignmentRow> assignments =
+                await connection.QueryAsync<SessionTaskAssignmentRow>(
+                    assignmentSql,
+                    new { SessionIds = sessions.Select(session => session.Id).ToArray() });
+
+            Dictionary<Guid, List<Guid>> assignedTaskIdsBySessionId = assignments
+                .GroupBy(assignment => assignment.SessionId)
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.Select(assignment => assignment.TaskId).ToList());
+
+            foreach (LSessionDto session in sessions)
+            {
+                if (assignedTaskIdsBySessionId.TryGetValue(session.Id, out List<Guid>? assignedTaskIds))
+                {
+                    session.AssignedTaskIds = assignedTaskIds;
+                }
+            }
+
             return Result.Success<IReadOnlyCollection<LSessionDto>>(sessions);
+        }
+
+        private sealed class SessionTaskAssignmentRow
+        {
+            public Guid SessionId { get; init; }
+            public Guid TaskId { get; init; }
         }
     }
 }

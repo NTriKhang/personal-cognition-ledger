@@ -37,9 +37,9 @@ namespace PCL.Modules.Session.Domain.LSessions
                 "LSession.NotActive",
                 "The learning session is not active.");
 
-        public static readonly Error InvalidActivityId =
+        public static readonly Error InvalidTaskId =
             Error.Problem(
-                "LSession.InvalidActivityId",
-                "ActivityId cannot be empty.");
+                "LSession.InvalidTaskId",
+                "TaskId cannot be empty.");
     }
 }

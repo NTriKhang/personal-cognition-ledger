@@ -14,7 +14,9 @@ namespace PCL.Modules.Session.Infrastructure.LSessions
 
         public async Task<LSession?> GetAsync(Guid id)
         {
-            return await context.LSessions.SingleOrDefaultAsync(x => x.Id == id);
+            return await context.LSessions
+                .Include("_taskAssignments")
+                .SingleOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<bool> HasActiveSessionAsync(Guid ownerId, CancellationToken cancellationToken = default)

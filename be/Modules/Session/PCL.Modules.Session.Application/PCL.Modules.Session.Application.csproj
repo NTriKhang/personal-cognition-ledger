@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Common\Common.Application\Common.Application.csproj" />
+    <ProjectReference Include="..\PCL.Modules.Session.Application.Contracts\PCL.Modules.Session.Contracts.csproj" />
     <ProjectReference Include="..\..\TaskPlanning\PCL.Modules.TaskPlanning.Application.Contracts\PCL.Modules.TaskPlanning.Contracts.csproj" />
     <ProjectReference Include="..\PCL.Modules.Session.Domain\PCL.Modules.Session.Domain.csproj" />
   </ItemGroup>

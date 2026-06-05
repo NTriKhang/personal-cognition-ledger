@@ -25,6 +25,7 @@ namespace PCL.Modules.Session.Infrastructure.Database
             modelBuilder.ApplyConfiguration(new LSessionConfiguration());
             modelBuilder.ApplyConfiguration(new SessionTaskAssignmentConfiguration());
             modelBuilder.ApplyConfiguration(new OutboxMessageConfiguration());
+            modelBuilder.ApplyConfiguration(new OutboxMessageConsumerConfiguration());
         }
     }
 }

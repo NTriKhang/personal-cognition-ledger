@@ -20,6 +20,7 @@ namespace PCL.Modules.TaskPlanning.Infrastructure.Database
 
             modelBuilder.ApplyConfiguration(new TaskConfiguration());
             modelBuilder.ApplyConfiguration(new OutboxMessageConfiguration());
+            modelBuilder.ApplyConfiguration(new OutboxMessageConsumerConfiguration());
         }
     }
 }

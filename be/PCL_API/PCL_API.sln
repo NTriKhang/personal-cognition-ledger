@@ -39,6 +39,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCL.Modules.TaskPlanning.Pr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCL.Modules.TaskPlanning.Contracts", "..\Modules\TaskPlanning\PCL.Modules.TaskPlanning.Application.Contracts\PCL.Modules.TaskPlanning.Contracts.csproj", "{638D399E-32F7-4423-AC12-9B7E1C4491EC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCL.Modules.Session.Contracts", "..\Modules\Session\PCL.Modules.Session.Application.Contracts\PCL.Modules.Session.Contracts.csproj", "{8419B2DB-B8F8-4259-9A3A-A695029C5AEC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -101,6 +103,10 @@ Global
 		{638D399E-32F7-4423-AC12-9B7E1C4491EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{638D399E-32F7-4423-AC12-9B7E1C4491EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{638D399E-32F7-4423-AC12-9B7E1C4491EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8419B2DB-B8F8-4259-9A3A-A695029C5AEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8419B2DB-B8F8-4259-9A3A-A695029C5AEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8419B2DB-B8F8-4259-9A3A-A695029C5AEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8419B2DB-B8F8-4259-9A3A-A695029C5AEC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

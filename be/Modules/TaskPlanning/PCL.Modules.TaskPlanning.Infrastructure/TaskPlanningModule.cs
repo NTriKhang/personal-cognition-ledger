@@ -1,13 +1,13 @@
+using Common.Application.Messaging;
 using Common.Infrastructure.Outbox;
 using Common.Presentation.Endpoints;
-using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using PCL.Modules.TaskPlanning.Application.Abstractions.Data;
 using PCL.Modules.TaskPlanning.Application.Repositories;
-using PCL.Modules.TaskPlanning.Application.Tasks;
 using PCL.Modules.TaskPlanning.Application.Tasks.AssignmentEligibility;
 using PCL.Modules.TaskPlanning.Contracts.Tasks;
 using PCL.Modules.TaskPlanning.Infrastructure.Database;
@@ -21,6 +21,7 @@ namespace PCL.Modules.TaskPlanning.Infrastructure
             this IServiceCollection services,
             IConfiguration configuration)
         {
+            services.AddDomainEventHandlers();
             services.AddInfrastructure(configuration);
             services.AddEndpoints(Presentation.AssemblyReference.Assembly);
 
@@ -37,20 +38,42 @@ namespace PCL.Modules.TaskPlanning.Infrastructure
                 .AddInterceptors(sp.GetRequiredService<InsertOutboxMessagesInterceptor>()));
 
             services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<TaskPlanningDbContext>());
-
             services.AddScoped<ITaskRepository, TaskRepository>();
-            services.AddScoped<ITaskAssignmentEligibilityChecker, TaskAssignmentEligibilityChecker>();
-            services.AddScoped<TaskProjectionAffectingDomainEventHandler>();
 
             services.AddOutboxProcessor(
                 moduleName: "TaskPlanning",
                 configuration.GetSection("Outbox:TaskPlanning"));
         }
 
-        public static void ConfigureConsumers(IRegistrationConfigurator registrationConfigurator)
+        private static void AddDomainEventHandlers(this IServiceCollection services)
         {
+            services.AddScoped<ITaskAssignmentEligibilityChecker, TaskAssignmentEligibilityChecker>();
 
-            //registrationConfigurator.ADdconsumer;
+            Type[] domainEventHandlers = Application.AssemblyReference.Assembly
+                .GetTypes()
+                .Where(t => t.IsAssignableTo(typeof(IDomainEventHandler)))
+                .ToArray();
+
+            foreach (Type domainEventHandler in domainEventHandlers)
+            {
+                services.TryAddScoped(domainEventHandler);
+
+                Type domainEvent = domainEventHandler
+                    .GetInterfaces()
+                    .Single(i =>
+                        i.IsGenericType &&
+                        i.GetGenericTypeDefinition() == typeof(IDomainEventHandler<>))
+                    .GetGenericArguments()
+                    .Single();
+
+                Type closedIdempotentHandler = typeof(IdempotentDomainEventHandler<>).MakeGenericType(domainEvent);
+
+                services.Decorate(domainEventHandler, closedIdempotentHandler);
+            }
+        }
+
+        public static void ConfigureConsumers()
+        {
         }
     }
 }

@@ -62,20 +62,15 @@ public static class InfrastructureConfiguration
 
         services.TryAddSingleton<ICacheService, CacheService>();
 
-        //services.AddMassTransit(configure =>
-        //{
-        //    foreach (Action<IRegistrationConfigurator> configureConsumers in moduleConfigureConsumers)
-        //    {
-        //        configureConsumers(configure);
-        //    }
+        services.AddMassTransit(configure =>
+        {
+            configure.SetKebabCaseEndpointNameFormatter();
 
-        //    configure.SetKebabCaseEndpointNameFormatter();
-
-        //    configure.UsingInMemory((context, cfg) =>
-        //    {
-        //        cfg.ConfigureEndpoints(context);
-        //    });
-        //});
+            configure.UsingInMemory((context, cfg) =>
+            {
+                cfg.ConfigureEndpoints(context);
+            });
+        });
 
         return services;
     }

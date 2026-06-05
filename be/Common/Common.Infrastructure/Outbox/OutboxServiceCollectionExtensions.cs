@@ -14,6 +14,8 @@ public static class OutboxServiceCollectionExtensions
     {
         services.Configure<OutboxOptions>(moduleName, configurationSection);
 
+        services.AddSingleton(new OutboxModuleRegistration(moduleName));
+
         services.AddSingleton<IConfigureOptions<QuartzOptions>>(sp =>
             new ConfigureProcessOutboxJob(
                 moduleName,

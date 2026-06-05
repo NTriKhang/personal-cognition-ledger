@@ -98,8 +98,12 @@ namespace PCL.Modules.Session.Domain.LSessions
             if (taskId == Guid.Empty)
                 return Result.Failure(LSessionErrors.InvalidTaskId);
 
-            if (_taskAssignments.All(assignment => assignment.TaskId != taskId))
-                _taskAssignments.Add(SessionTaskAssignment.Create(Id, taskId, assignedAt));
+            if (_taskAssignments.Any(assignment => assignment.TaskId == taskId))
+                return Result.Failure(LSessionErrors.TaskAlreadyAssigned);
+
+            _taskAssignments.Add(SessionTaskAssignment.Create(Id, taskId, assignedAt));
+
+            Raise(new TaskAssignedToSessionDomainEvent(Id, OwnerId, taskId, assignedAt));
 
             return Result.Success();
         }

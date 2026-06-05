@@ -14,6 +14,11 @@ namespace PCL.Modules.Session.Application.Repositories
     {
         Task<LSession?> GetAsync(Guid id);
         Task<bool> HasActiveSessionAsync(Guid ownerId, CancellationToken cancellationToken = default);
+        Task<bool> IsTaskAssignedToAnotherActiveSessionAsync(
+            Guid taskId,
+            Guid currentSessionId,
+            Guid ownerId,
+            CancellationToken cancellationToken = default);
         void AddAsync(LSession session);
     }
 }

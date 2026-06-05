@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -8,8 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Common\Common.Application\Common.Application.csproj" />
-    <ProjectReference Include="..\..\TaskPlanning\PCL.Modules.TaskPlanning.Application.Contracts\PCL.Modules.TaskPlanning.Contracts.csproj" />
-    <ProjectReference Include="..\PCL.Modules.Session.Domain\PCL.Modules.Session.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Common\Common.Domain\Common.Domain.csproj" />
   </ItemGroup>
 
 </Project>

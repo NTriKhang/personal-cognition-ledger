@@ -41,5 +41,15 @@ namespace PCL.Modules.Session.Domain.LSessions
             Error.Problem(
                 "LSession.InvalidTaskId",
                 "TaskId cannot be empty.");
+
+        public static readonly Error TaskAlreadyAssigned =
+            Error.Conflict(
+                "LSession.TaskAlreadyAssigned",
+                "The task is already assigned to this learning session.");
+
+        public static readonly Error TaskAlreadyAssignedToAnotherActiveSession =
+            Error.Conflict(
+                "LSession.TaskAlreadyAssignedToAnotherActiveSession",
+                "The task is already assigned to another active learning session.");
     }
 }

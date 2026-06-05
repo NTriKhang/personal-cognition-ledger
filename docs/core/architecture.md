@@ -63,6 +63,8 @@ A module owns:
 
 Modules communicate primarily through integration events rather than direct database access.
 
+When immediate cross-module validation is required inside the monolith, use narrow synchronous application contracts owned by the provider module. See `docs/core/module-rules.md`.
+
 ---
 
 ## Clean Architecture

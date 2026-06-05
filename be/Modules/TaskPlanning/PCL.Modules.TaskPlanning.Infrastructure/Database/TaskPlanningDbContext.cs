@@ -1,3 +1,4 @@
+using Common.Infrastructure.Outbox;
 using Microsoft.EntityFrameworkCore;
 using PCL.Modules.TaskPlanning.Application.Abstractions.Data;
 using PCL.Modules.TaskPlanning.Infrastructure.Tasks;
@@ -18,6 +19,7 @@ namespace PCL.Modules.TaskPlanning.Infrastructure.Database
             TaskConfiguration.ConfigureSequence(modelBuilder);
 
             modelBuilder.ApplyConfiguration(new TaskConfiguration());
+            modelBuilder.ApplyConfiguration(new OutboxMessageConfiguration());
         }
     }
 }

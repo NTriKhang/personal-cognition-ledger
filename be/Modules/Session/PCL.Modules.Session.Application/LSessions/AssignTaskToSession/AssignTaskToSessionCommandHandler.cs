@@ -10,6 +10,7 @@ namespace PCL.Modules.Session.Application.LSessions.AssignTaskToSession
 {
     sealed class AssignTaskToSessionCommandHandler(
         ILSessionRepository repository,
+        IAssignTaskToSessionPolicy assignmentPolicy,
         IUnitOfWork unitOfWork) : ICommandHandler<AssignTaskToSessionCommand>
     {
         public async Task<Result> Handle(AssignTaskToSessionCommand request, CancellationToken cancellationToken)
@@ -19,6 +20,16 @@ namespace PCL.Modules.Session.Application.LSessions.AssignTaskToSession
             if (session == null)
             {
                 return Result.Failure(LSessionErrors.NotFound(request.SessionId));
+            }
+
+            Result validationResult = await assignmentPolicy.ValidateAsync(
+                session,
+                request.TaskId,
+                cancellationToken);
+
+            if (validationResult.IsFailure)
+            {
+                return validationResult;
             }
 
             Result assignResult = session.AssignTask(request.TaskId, request.AssignedAt);

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PCL.Modules.Session.Application.Abstractions.Data;
+using PCL.Modules.Session.Application.LSessions.AssignTaskToSession;
 using PCL.Modules.Session.Application.Repositories;
 using PCL.Modules.Session.Infrastructure.Database;
 using PCL.Modules.Session.Infrastructure.LSessions;
@@ -41,6 +42,7 @@ namespace PCL.Modules.Session.Infrastructure
             services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<LSessionDbContext>());
 
             services.AddScoped<ILSessionRepository, LSessionRepository>();
+            services.AddScoped<IAssignTaskToSessionPolicy, AssignTaskToSessionPolicy>();
             services.AddAutoMapper((sp, cfg) => { }, Session.Application.AssemblyReference.Assembly);
 
             services.AddOutboxProcessor(

@@ -25,6 +25,25 @@ namespace PCL.Modules.Session.Infrastructure.LSessions
                 x => x.OwnerId == ownerId && x.Status == LSessionStatus.Active,
                 cancellationToken);
         }
+
+        public async Task<bool> IsTaskAssignedToAnotherActiveSessionAsync(
+            Guid taskId,
+            Guid currentSessionId,
+            Guid ownerId,
+            CancellationToken cancellationToken = default)
+        {
+            return await context.SessionTaskAssignments
+                .AnyAsync(
+                    assignment =>
+                        assignment.TaskId == taskId &&
+                        assignment.SessionId != currentSessionId &&
+                        context.LSessions.Any(
+                            session =>
+                                session.Id == assignment.SessionId &&
+                                session.OwnerId == ownerId &&
+                                session.Status == LSessionStatus.Active),
+                    cancellationToken);
+        }
     }
 }
 

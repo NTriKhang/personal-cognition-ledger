@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35527.113 d17.12
+VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCL_API", "PCL_API.csproj", "{A877564C-FD02-44A5-86E0-FEC489DF1427}"
 EndProject
@@ -36,6 +36,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCL.Modules.TaskPlanning.Infrastructure", "..\Modules\TaskPlanning\PCL.Modules.TaskPlanning.Infrastructure\PCL.Modules.TaskPlanning.Infrastructure.csproj", "{7DFB74B2-DD85-49F3-8C98-FEEA81788045}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCL.Modules.TaskPlanning.Presentation", "..\Modules\TaskPlanning\PCL.Modules.TaskPlanning.Presentation\PCL.Modules.TaskPlanning.Presentation.csproj", "{02AD9E48-E8A9-4C24-8388-CDA0B6BF1A3A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCL.Modules.TaskPlanning.Contracts", "..\Modules\TaskPlanning\PCL.Modules.TaskPlanning.Application.Contracts\PCL.Modules.TaskPlanning.Contracts.csproj", "{638D399E-32F7-4423-AC12-9B7E1C4491EC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -95,6 +97,10 @@ Global
 		{02AD9E48-E8A9-4C24-8388-CDA0B6BF1A3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02AD9E48-E8A9-4C24-8388-CDA0B6BF1A3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{02AD9E48-E8A9-4C24-8388-CDA0B6BF1A3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{638D399E-32F7-4423-AC12-9B7E1C4491EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{638D399E-32F7-4423-AC12-9B7E1C4491EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{638D399E-32F7-4423-AC12-9B7E1C4491EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{638D399E-32F7-4423-AC12-9B7E1C4491EC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -114,5 +120,6 @@ Global
 		{BEA23D78-4A2D-4B27-AF7C-203F7C4C3919} = {F16A81C4-30CB-4FEC-9E35-BC6F3490165C}
 		{7DFB74B2-DD85-49F3-8C98-FEEA81788045} = {F16A81C4-30CB-4FEC-9E35-BC6F3490165C}
 		{02AD9E48-E8A9-4C24-8388-CDA0B6BF1A3A} = {F16A81C4-30CB-4FEC-9E35-BC6F3490165C}
+		{638D399E-32F7-4423-AC12-9B7E1C4491EC} = {F16A81C4-30CB-4FEC-9E35-BC6F3490165C}
 	EndGlobalSection
 EndGlobal

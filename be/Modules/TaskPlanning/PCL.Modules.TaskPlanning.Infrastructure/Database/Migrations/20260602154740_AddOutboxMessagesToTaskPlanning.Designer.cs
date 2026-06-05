@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PCL.Modules.TaskPlanning.Infrastructure.Database;
@@ -11,9 +12,11 @@ using PCL.Modules.TaskPlanning.Infrastructure.Database;
 namespace PCL.Modules.TaskPlanning.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(TaskPlanningDbContext))]
-    partial class TaskPlanningDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260602154740_AddOutboxMessagesToTaskPlanning")]
+    partial class AddOutboxMessagesToTaskPlanning
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -4,23 +4,23 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Quartz;
 
-namespace Common.Infrastructure.Outbox;
+namespace Common.Infrastructure.Inbox;
 
-public static class OutboxServiceCollectionExtensions
+public static class InboxServiceCollectionExtensions
 {
-    public static IServiceCollection AddOutboxProcessor<TModule>(
+    public static IServiceCollection AddInboxProcessor<TModule>(
         this IServiceCollection services,
         IConfigurationSection configurationSection)
         where TModule : IModuleMarker
     {
         string moduleName = TModule.ModuleName;
 
-        services.Configure<OutboxOptions>(moduleName, configurationSection);
+        services.Configure<InboxOptions>(moduleName, configurationSection);
 
         services.AddSingleton<IConfigureOptions<QuartzOptions>>(sp =>
-            new ConfigureProcessOutboxJob(
+            new ConfigureProcessInboxJob(
                 moduleName,
-                sp.GetRequiredService<IOptionsMonitor<OutboxOptions>>()));
+                sp.GetRequiredService<IOptionsMonitor<InboxOptions>>()));
 
         return services;
     }

@@ -1,4 +1,5 @@
 using Common.Application.Messaging;
+using Common.Infrastructure;
 using Common.Infrastructure.Outbox;
 using Common.Presentation.Endpoints;
 using Microsoft.EntityFrameworkCore;
@@ -16,11 +17,13 @@ namespace PCL.Modules.Session.Infrastructure
 {
     public static class LSessionModule
     {
+        internal const string ModuleName = "Session";
+
         public static IServiceCollection AddLSessionModule(
         this IServiceCollection services,
         IConfiguration configuration)
         {
-            services.AddDomainEventHandlers();
+            services.AddDomainEventHandlers<SessionModuleMarker>();
 
             //services.AddIntegrationEventHandlers();
 
@@ -47,13 +50,13 @@ namespace PCL.Modules.Session.Infrastructure
             services.AddScoped<IAssignTaskToSessionPolicy, AssignTaskToSessionPolicy>();
             services.AddAutoMapper((sp, cfg) => { }, Session.Application.AssemblyReference.Assembly);
 
-            services.AddOutboxProcessor(
-                moduleName: "Session",
+            services.AddOutboxProcessor<SessionModuleMarker>(
                 configuration.GetSection("Outbox:Session"));
 
         }
 
-        private static void AddDomainEventHandlers(this IServiceCollection services)
+        private static void AddDomainEventHandlers<TModule>(this IServiceCollection services)
+            where TModule : IModuleMarker
         {
             Type[] domainEventHandlers = Application.AssemblyReference.Assembly
                 .GetTypes()
@@ -72,11 +75,17 @@ namespace PCL.Modules.Session.Infrastructure
                     .GetGenericArguments()
                     .Single();
 
-                Type closedIdempotentHandler = typeof(IdempotentDomainEventHandler<>).MakeGenericType(domainEvent);
+                Type closedIdempotentHandler = typeof(IdempotentDomainEventHandler<,>)
+                    .MakeGenericType(domainEvent, typeof(TModule));
 
                 services.Decorate(domainEventHandler, closedIdempotentHandler);
             }
         }
+    }
+
+    public sealed class SessionModuleMarker : IModuleMarker
+    {
+        public static string ModuleName => LSessionModule.ModuleName;
     }
 }
 

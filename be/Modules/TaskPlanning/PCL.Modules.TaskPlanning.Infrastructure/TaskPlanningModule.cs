@@ -1,11 +1,15 @@
 using Common.Application.Messaging;
+using Common.Infrastructure;
 using Common.Infrastructure.Outbox;
+using Common.Infrastructure.Inbox;
 using Common.Presentation.Endpoints;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using PCL.Modules.Session.Contracts.LSessions;
 using PCL.Modules.TaskPlanning.Application.Abstractions.Data;
 using PCL.Modules.TaskPlanning.Application.Repositories;
 using PCL.Modules.TaskPlanning.Application.Tasks.AssignmentEligibility;
@@ -17,11 +21,13 @@ namespace PCL.Modules.TaskPlanning.Infrastructure
 {
     public static class TaskPlanningModule
     {
+        internal const string ModuleName = "TaskPlanning";
+
         public static IServiceCollection AddTaskPlanningModule(
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.AddDomainEventHandlers();
+            services.AddDomainEventHandlers<TaskPlanningModuleMarker>();
             services.AddInfrastructure(configuration);
             services.AddEndpoints(Presentation.AssemblyReference.Assembly);
 
@@ -40,12 +46,15 @@ namespace PCL.Modules.TaskPlanning.Infrastructure
             services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<TaskPlanningDbContext>());
             services.AddScoped<ITaskRepository, TaskRepository>();
 
-            services.AddOutboxProcessor(
-                moduleName: "TaskPlanning",
+            services.AddOutboxProcessor<TaskPlanningModuleMarker>(
                 configuration.GetSection("Outbox:TaskPlanning"));
+
+            services.AddInboxProcessor<TaskPlanningModuleMarker>(
+                configuration.GetSection("Inbox:TaskPlanning"));
         }
 
-        private static void AddDomainEventHandlers(this IServiceCollection services)
+        private static void AddDomainEventHandlers<TModule>(this IServiceCollection services)
+            where TModule : IModuleMarker
         {
             services.AddScoped<ITaskAssignmentEligibilityChecker, TaskAssignmentEligibilityChecker>();
 
@@ -66,14 +75,21 @@ namespace PCL.Modules.TaskPlanning.Infrastructure
                     .GetGenericArguments()
                     .Single();
 
-                Type closedIdempotentHandler = typeof(IdempotentDomainEventHandler<>).MakeGenericType(domainEvent);
+                Type closedIdempotentHandler = typeof(IdempotentDomainEventHandler<,>)
+                    .MakeGenericType(domainEvent, typeof(TModule));
 
                 services.Decorate(domainEventHandler, closedIdempotentHandler);
             }
         }
 
-        public static void ConfigureConsumers()
+        public static void ConfigureConsumers(IRegistrationConfigurator registrationConfigurator)
         {
+            registrationConfigurator.AddInboxConsumer<TaskAssignedToSessionIntegrationEvent, TaskPlanningModuleMarker>();
         }
+    }
+
+    public sealed class TaskPlanningModuleMarker : IModuleMarker
+    {
+        public static string ModuleName => TaskPlanningModule.ModuleName;
     }
 }

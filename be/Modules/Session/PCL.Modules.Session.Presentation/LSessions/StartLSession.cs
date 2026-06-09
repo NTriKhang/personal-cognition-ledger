@@ -20,8 +20,7 @@ internal sealed class StartLearningSession : IEndpoint
                 request.Id,
                 request.OwnerId,
                 request.Title,
-                request.StartedAt,
-                request.AssignedTaskIds);
+                request.StartedAt);
 
             Result<Guid> result = await sender.Send(command);
 
@@ -36,6 +35,5 @@ internal sealed class StartLearningSession : IEndpoint
         Guid? Id,
         Guid OwnerId,
         string Title,
-        DateTimeOffset StartedAt,
-        IEnumerable<Guid>? AssignedTaskIds);
+        DateTimeOffset StartedAt);
 }

@@ -27,6 +27,9 @@ builder.Services.AddApplication(moduleApplicationAssemblies);
 string databaseConnectionString = builder.Configuration.GetConnectionStringOrThrow("Database");
 
 builder.Services.AddInfrastructure(
+    [
+        TaskPlanningModule.ConfigureConsumers,
+    ],
     databaseConnectionString);
 
 builder.Services.AddLSessionModule(builder.Configuration);

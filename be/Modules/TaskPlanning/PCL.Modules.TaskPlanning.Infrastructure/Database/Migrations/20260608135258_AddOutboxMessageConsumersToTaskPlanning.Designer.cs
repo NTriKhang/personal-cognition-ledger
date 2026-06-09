@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PCL.Modules.TaskPlanning.Infrastructure.Database;
@@ -11,9 +12,11 @@ using PCL.Modules.TaskPlanning.Infrastructure.Database;
 namespace PCL.Modules.TaskPlanning.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(TaskPlanningDbContext))]
-    partial class TaskPlanningDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260608135258_AddOutboxMessageConsumersToTaskPlanning")]
+    partial class AddOutboxMessageConsumersToTaskPlanning
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,49 +28,6 @@ namespace PCL.Modules.TaskPlanning.Infrastructure.Database.Migrations
 
             modelBuilder.HasSequence<int>("TaskSq", "task_planning")
                 .IncrementsBy(2);
-
-            modelBuilder.Entity("Common.Infrastructure.Inbox.InboxMessage", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("jsonb");
-
-                    b.Property<string>("Error")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("OccurredOnUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("ProcessedOnUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("inbox_messages", "task_planning");
-                });
-
-            modelBuilder.Entity("Common.Infrastructure.Inbox.InboxMessageConsumer", b =>
-                {
-                    b.Property<Guid>("InboxMessageId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.HasKey("InboxMessageId", "Name");
-
-                    b.ToTable("inbox_message_consumers", "task_planning");
-                });
 
             modelBuilder.Entity("Common.Infrastructure.Outbox.OutboxMessage", b =>
                 {

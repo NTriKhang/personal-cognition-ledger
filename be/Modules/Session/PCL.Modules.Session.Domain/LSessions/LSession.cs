@@ -30,7 +30,7 @@ namespace PCL.Modules.Session.Domain.LSessions
         /// <summary>
         /// Factory to create a new LearningSession. Ensures StartedAt is provided and session starts Active.
         /// </summary>
-        public static Result<LSession> StartNew(Guid ownerId, string title, DateTimeOffset startedAt, IEnumerable<Guid>? assignedTaskIds = null)
+        public static Result<LSession> StartNew(Guid ownerId, string title, DateTimeOffset startedAt)
         {
             if (ownerId == Guid.Empty)
                 return Result.Failure<LSession>(LSessionErrors.InvalidOwnerId);
@@ -46,19 +46,6 @@ namespace PCL.Modules.Session.Domain.LSessions
                 StartedAt = startedAt,
                 Status = LSessionStatus.Active
             };
-
-            if (assignedTaskIds != null)
-            {
-                foreach (Guid taskId in assignedTaskIds.Distinct())
-                {
-                    Result assignResult = session.AssignTask(taskId, startedAt);
-
-                    if (assignResult.IsFailure)
-                    {
-                        return Result.Failure<LSession>(assignResult.Error);
-                    }
-                }
-            }
 
             session.Raise(new LSessionStartedDomainEvent(session.Id, session.StartedAt));
 

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PCL.Modules.TaskPlanning.Infrastructure.Database;
@@ -11,9 +12,11 @@ using PCL.Modules.TaskPlanning.Infrastructure.Database;
 namespace PCL.Modules.TaskPlanning.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(TaskPlanningDbContext))]
-    partial class TaskPlanningDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260608151735_AddInboxMessagesToTaskPlanning")]
+    partial class AddInboxMessagesToTaskPlanning
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -53,20 +56,6 @@ namespace PCL.Modules.TaskPlanning.Infrastructure.Database.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("inbox_messages", "task_planning");
-                });
-
-            modelBuilder.Entity("Common.Infrastructure.Inbox.InboxMessageConsumer", b =>
-                {
-                    b.Property<Guid>("InboxMessageId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.HasKey("InboxMessageId", "Name");
-
-                    b.ToTable("inbox_message_consumers", "task_planning");
                 });
 
             modelBuilder.Entity("Common.Infrastructure.Outbox.OutboxMessage", b =>

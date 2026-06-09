@@ -3,24 +3,25 @@ using Dapper;
 using Common.Application.Data;
 using Common.Application.Messaging;
 using Common.Domain;
+using Common.Infrastructure;
 using Microsoft.Extensions.Options;
 
 namespace Common.Infrastructure.Outbox;
 
-public sealed class IdempotentDomainEventHandler<TDomainEvent>(
+public sealed class IdempotentDomainEventHandler<TDomainEvent, TModule>(
     IDomainEventHandler<TDomainEvent> decorated,
     IDbConnectionFactory dbConnectionFactory,
-    IOptionsMonitor<OutboxOptions> outboxOptions,
-    IEnumerable<OutboxModuleRegistration> moduleRegistrations)
+    IOptionsMonitor<OutboxOptions> outboxOptions)
     : DomainEventHandler<TDomainEvent>
     where TDomainEvent : IDomainEvent
+    where TModule : IModuleMarker
 {
     public override async Task Handle(TDomainEvent domainEvent, CancellationToken cancellationToken = default)
     {
         await using DbConnection connection = await dbConnectionFactory.OpenConnectionAsync();
 
         var outboxMessageConsumer = new OutboxMessageConsumer(domainEvent.Id, decorated.GetType().Name);
-        OutboxOptions options = GetOutboxOptions();
+        OutboxOptions options = outboxOptions.Get(TModule.ModuleName);
 
         if (await OutboxConsumerExistsAsync(connection, outboxMessageConsumer, options))
         {
@@ -30,27 +31,6 @@ public sealed class IdempotentDomainEventHandler<TDomainEvent>(
         await decorated.Handle(domainEvent, cancellationToken);
 
         await InsertOutboxConsumerAsync(connection, outboxMessageConsumer, options);
-    }
-
-    private OutboxOptions GetOutboxOptions()
-    {
-        string handlerAssemblyName = decorated.GetType().Assembly.GetName().Name!;
-
-        foreach (OutboxModuleRegistration moduleRegistration in moduleRegistrations)
-        {
-            OutboxOptions options = outboxOptions.Get(moduleRegistration.ModuleName);
-
-            if (string.Equals(
-                    options.HandlerAssemblyName,
-                    handlerAssemblyName,
-                    StringComparison.Ordinal))
-            {
-                return options;
-            }
-        }
-
-        throw new InvalidOperationException(
-            $"Outbox options were not found for domain event handler assembly '{handlerAssemblyName}'.");
     }
 
     private static async Task<bool> OutboxConsumerExistsAsync(

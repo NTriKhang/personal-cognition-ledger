@@ -7,6 +7,9 @@ public static class SerializerSettings
     public static readonly JsonSerializerSettings Instance = new()
     {
         TypeNameHandling = TypeNameHandling.All,
-        MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead
+        MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead,
+        DateParseHandling = DateParseHandling.DateTimeOffset,
+        DateTimeZoneHandling = DateTimeZoneHandling.RoundtripKind,
+        DateFormatHandling = DateFormatHandling.IsoDateFormat
     };
 }

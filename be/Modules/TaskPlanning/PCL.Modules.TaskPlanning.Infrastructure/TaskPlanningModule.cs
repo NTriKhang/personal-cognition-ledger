@@ -1,4 +1,5 @@
 using Common.Application.Messaging;
+using Common.Application.EventBus;
 using Common.Infrastructure;
 using Common.Infrastructure.Outbox;
 using Common.Infrastructure.Inbox;
@@ -28,6 +29,7 @@ namespace PCL.Modules.TaskPlanning.Infrastructure
             IConfiguration configuration)
         {
             services.AddDomainEventHandlers<TaskPlanningModuleMarker>();
+            services.AddIntegrationEventHandlers<TaskPlanningModuleMarker>();
             services.AddInfrastructure(configuration);
             services.AddEndpoints(Presentation.AssemblyReference.Assembly);
 
@@ -79,6 +81,33 @@ namespace PCL.Modules.TaskPlanning.Infrastructure
                     .MakeGenericType(domainEvent, typeof(TModule));
 
                 services.Decorate(domainEventHandler, closedIdempotentHandler);
+            }
+        }
+
+        private static void AddIntegrationEventHandlers<TModule>(this IServiceCollection services)
+            where TModule : IModuleMarker
+        {
+            Type[] integrationEventHandlers = Presentation.AssemblyReference.Assembly
+                .GetTypes()
+                .Where(t => t.IsAssignableTo(typeof(IIntegrationEventHandler)))
+                .ToArray();
+
+            foreach (Type integrationEventHandler in integrationEventHandlers)
+            {
+                services.TryAddScoped(integrationEventHandler);
+
+                Type integrationEvent = integrationEventHandler
+                    .GetInterfaces()
+                    .Single(i =>
+                        i.IsGenericType &&
+                        i.GetGenericTypeDefinition() == typeof(IIntegrationEventHandler<>))
+                    .GetGenericArguments()
+                    .Single();
+
+                Type closedIdempotentHandler = typeof(IdempotentIntegrationEventHandler<,>)
+                    .MakeGenericType(integrationEvent, typeof(TModule));
+
+                services.Decorate(integrationEventHandler, closedIdempotentHandler);
             }
         }
 

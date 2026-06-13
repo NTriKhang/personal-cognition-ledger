@@ -114,6 +114,8 @@ namespace PCL.Modules.Session.Domain.LSessions
             if (assignment is not null)
             {
                 _taskAssignments.Remove(assignment);
+
+                Raise(new TaskRemovedFromSessionDomainEvent(Id, OwnerId, taskId));
             }
 
             return Result.Success();

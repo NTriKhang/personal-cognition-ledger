@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PCL.Modules.Evidence.Infrastructure.Database;
 using PCL.Modules.Session.Infrastructure.Database;
 using PCL.Modules.TaskPlanning.Infrastructure.Database;
 
@@ -10,6 +11,7 @@ namespace PCL_API.Extensions
         {
             using IServiceScope scope = app.ApplicationServices.CreateScope();
 
+            ApplyMigration<EvidenceDbContext>(scope);
             ApplyMigration<LSessionDbContext>(scope);
             ApplyMigration<TaskPlanningDbContext>(scope);
         }

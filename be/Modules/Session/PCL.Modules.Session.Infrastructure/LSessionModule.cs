@@ -9,7 +9,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using PCL.Modules.Session.Application.Abstractions.Data;
 using PCL.Modules.Session.Application.LSessions.AssignTaskToSession;
+using PCL.Modules.Session.Application.LSessions.EvidenceAttachmentEligibility;
 using PCL.Modules.Session.Application.Repositories;
+using PCL.Modules.Session.Contracts.LSessions;
 using PCL.Modules.Session.Infrastructure.Database;
 using PCL.Modules.Session.Infrastructure.LSessions;
 
@@ -48,6 +50,7 @@ namespace PCL.Modules.Session.Infrastructure
 
             services.AddScoped<ILSessionRepository, LSessionRepository>();
             services.AddScoped<IAssignTaskToSessionPolicy, AssignTaskToSessionPolicy>();
+            services.AddScoped<ISessionEvidenceAttachmentEligibilityChecker, SessionEvidenceAttachmentEligibilityChecker>();
             services.AddAutoMapper((sp, cfg) => { }, Session.Application.AssemblyReference.Assembly);
 
             services.AddOutboxProcessor<SessionModuleMarker>(

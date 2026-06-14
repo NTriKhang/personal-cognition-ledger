@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PCL.Modules.Evidence.Infrastructure.Database;
@@ -11,9 +12,11 @@ using PCL.Modules.Evidence.Infrastructure.Database;
 namespace PCL.Modules.Evidence.Infrastructure.Database.Migrations
 {
     [DbContext(typeof(EvidenceDbContext))]
-    partial class EvidenceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260614062026_AddEvidenceFileUploadLifecycle")]
+    partial class AddEvidenceFileUploadLifecycle
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

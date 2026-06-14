@@ -32,6 +32,9 @@ public sealed class EvidenceItem : Entity
         string content,
         DateTimeOffset addedAt)
     {
+        if (type == EvidenceItemType.FileReference)
+            return Result.Failure<EvidenceItem>(EvidenceItemErrors.FileReferenceRequiresUploadInitialization);
+
         if (sessionId == Guid.Empty)
             return Result.Failure<EvidenceItem>(EvidenceItemErrors.InvalidSessionId);
 
@@ -55,25 +58,32 @@ public sealed class EvidenceItem : Entity
         if (type == EvidenceItemType.Link && !IsValidLink(normalizedContent))
             return Result.Failure<EvidenceItem>(EvidenceItemErrors.InvalidLink);
 
-        var evidenceItem = new EvidenceItem
-        {
-            Id = EvidenceItemId.New(),
-            SessionId = sessionId,
-            OwnerId = ownerId,
-            Type = type,
-            Content = normalizedContent,
-            AddedAt = addedAt
-        };
+        return Result.Success(Create(sessionId, ownerId, type, normalizedContent, addedAt));
+    }
 
-        evidenceItem.Raise(new EvidenceItemAddedDomainEvent(
-            evidenceItem.Id,
-            evidenceItem.SessionId,
-            evidenceItem.OwnerId,
-            evidenceItem.Type,
-            evidenceItem.Content,
-            evidenceItem.AddedAt));
+    public static Result<EvidenceItem> RegisterFileReference(
+        Guid sessionId,
+        Guid ownerId,
+        string? caption,
+        DateTimeOffset addedAt)
+    {
+        if (sessionId == Guid.Empty)
+            return Result.Failure<EvidenceItem>(EvidenceItemErrors.InvalidSessionId);
 
-        return Result.Success(evidenceItem);
+        if (ownerId == Guid.Empty)
+            return Result.Failure<EvidenceItem>(EvidenceItemErrors.InvalidOwnerId);
+
+        string normalizedCaption = NormalizeOptional(caption) ?? string.Empty;
+
+        if (normalizedCaption.Length > MaximumReferenceLength)
+            return Result.Failure<EvidenceItem>(EvidenceItemErrors.InvalidFileReferenceCaption);
+
+        return Result.Success(Create(
+            sessionId,
+            ownerId,
+            EvidenceItemType.FileReference,
+            normalizedCaption,
+            addedAt));
     }
 
     public Result Remove(Guid removedBy, DateTimeOffset removedAt, string? removalReason)
@@ -110,7 +120,8 @@ public sealed class EvidenceItem : Entity
         return Result.Success();
     }
 
-    public Result AttachFile(
+    public Result InitializeFileUpload(
+        EvidenceFileUploadAttemptId uploadAttemptId,
         string objectKey,
         string originalFileName,
         string contentType,
@@ -131,6 +142,7 @@ public sealed class EvidenceItem : Entity
 
         Result<EvidenceFile> fileResult = EvidenceFile.CreatePending(
             Id,
+            uploadAttemptId,
             objectKey,
             originalFileName,
             contentType,
@@ -146,6 +158,72 @@ public sealed class EvidenceItem : Entity
         File = fileResult.Value;
 
         return Result.Success();
+    }
+
+    public Result StartFileVerification(
+        EvidenceFileUploadAttemptId uploadAttemptId,
+        DateTimeOffset verifyingAt) =>
+        File is null
+            ? Result.Failure(EvidenceFileErrors.NotAttached)
+            : File.StartVerification(uploadAttemptId, verifyingAt);
+
+    public Result MarkFileReady(
+        EvidenceFileUploadAttemptId uploadAttemptId,
+        DateTimeOffset uploadedAt,
+        DateTimeOffset readyAt,
+        string? versionId) =>
+        File is null
+            ? Result.Failure(EvidenceFileErrors.NotAttached)
+            : File.MarkReady(uploadAttemptId, uploadedAt, readyAt, versionId);
+
+    public Result MarkFileFailed(
+        EvidenceFileUploadAttemptId uploadAttemptId,
+        string failureReason,
+        DateTimeOffset failedAt) =>
+        File is null
+            ? Result.Failure(EvidenceFileErrors.NotAttached)
+            : File.MarkFailed(uploadAttemptId, failureReason, failedAt);
+
+    public Result ExpireFileUpload(
+        EvidenceFileUploadAttemptId uploadAttemptId,
+        DateTimeOffset expiredAt) =>
+        File is null
+            ? Result.Failure(EvidenceFileErrors.NotAttached)
+            : File.Expire(uploadAttemptId, expiredAt);
+
+    public Result CancelFileUpload(
+        EvidenceFileUploadAttemptId uploadAttemptId,
+        DateTimeOffset cancelledAt) =>
+        File is null
+            ? Result.Failure(EvidenceFileErrors.NotAttached)
+            : File.Cancel(uploadAttemptId, cancelledAt);
+
+    private static EvidenceItem Create(
+        Guid sessionId,
+        Guid ownerId,
+        EvidenceItemType type,
+        string content,
+        DateTimeOffset addedAt)
+    {
+        var evidenceItem = new EvidenceItem
+        {
+            Id = EvidenceItemId.New(),
+            SessionId = sessionId,
+            OwnerId = ownerId,
+            Type = type,
+            Content = content,
+            AddedAt = addedAt
+        };
+
+        evidenceItem.Raise(new EvidenceItemAddedDomainEvent(
+            evidenceItem.Id,
+            evidenceItem.SessionId,
+            evidenceItem.OwnerId,
+            evidenceItem.Type,
+            evidenceItem.Content,
+            evidenceItem.AddedAt));
+
+        return evidenceItem;
     }
 
     private static string? NormalizeOptional(string? value) =>

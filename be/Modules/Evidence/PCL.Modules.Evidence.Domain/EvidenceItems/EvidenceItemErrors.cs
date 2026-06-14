@@ -36,6 +36,16 @@ public static class EvidenceItemErrors
             "EvidenceItem.InvalidLink",
             "Link evidence must contain an absolute HTTP or HTTPS URL.");
 
+    public static readonly Error InvalidFileReferenceCaption =
+        Error.Problem(
+            "EvidenceItem.InvalidFileReferenceCaption",
+            $"A file evidence caption cannot exceed {EvidenceItem.MaximumReferenceLength} characters.");
+
+    public static readonly Error FileReferenceRequiresUploadInitialization =
+        Error.Conflict(
+            "EvidenceItem.FileReferenceRequiresUploadInitialization",
+            "File evidence must be created through the file upload initialization workflow.");
+
     public static readonly Error InvalidRemovedBy =
         Error.Problem(
             "EvidenceItem.InvalidRemovedBy",

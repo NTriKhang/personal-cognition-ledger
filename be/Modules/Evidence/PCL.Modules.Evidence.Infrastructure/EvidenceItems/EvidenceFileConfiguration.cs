@@ -12,7 +12,7 @@ internal sealed class EvidenceFileConfiguration : IEntityTypeConfiguration<Evide
             "evidence_file",
             table => table.HasCheckConstraint(
                 "CK_evidence_file_FileSizeBytes",
-                "\"FileSizeBytes\" >= 0"));
+                $"\"FileSizeBytes\" > 0 AND \"FileSizeBytes\" <= {EvidenceFilePolicy.MaximumFileSizeBytes}"));
 
         builder.HasKey(evidenceFile => evidenceFile.EvidenceItemId);
 
@@ -20,6 +20,12 @@ internal sealed class EvidenceFileConfiguration : IEntityTypeConfiguration<Evide
             .HasConversion(
                 evidenceItemId => evidenceItemId.Value,
                 value => EvidenceItemId.From(value))
+            .ValueGeneratedNever();
+
+        builder.Property(evidenceFile => evidenceFile.UploadAttemptId)
+            .HasConversion(
+                uploadAttemptId => uploadAttemptId.Value,
+                value => EvidenceFileUploadAttemptId.From(value))
             .ValueGeneratedNever();
 
         builder.Property(evidenceFile => evidenceFile.ObjectKey)
@@ -52,6 +58,7 @@ internal sealed class EvidenceFileConfiguration : IEntityTypeConfiguration<Evide
 
         builder.Property(evidenceFile => evidenceFile.CreatedAt).IsRequired();
         builder.Property(evidenceFile => evidenceFile.UploadExpiresAt).IsRequired();
+        builder.Property(evidenceFile => evidenceFile.StatusChangedAt).IsRequired();
         builder.Property(evidenceFile => evidenceFile.UploadedAt);
 
         builder.Property(evidenceFile => evidenceFile.FailureReason)
@@ -63,6 +70,7 @@ internal sealed class EvidenceFileConfiguration : IEntityTypeConfiguration<Evide
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasIndex(evidenceFile => evidenceFile.ObjectKey).IsUnique();
+        builder.HasIndex(evidenceFile => evidenceFile.UploadAttemptId).IsUnique();
         builder.HasIndex(evidenceFile => new
         {
             evidenceFile.UploadStatus,

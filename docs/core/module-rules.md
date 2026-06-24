@@ -126,13 +126,13 @@ Recommended:
 
 ```text
 be/Modules/TaskPlanning/
-  PCL.Modules.TaskPlanning.Application.Contracts/
+  PCL.Modules.TaskPlanning.Contracts/
     Tasks/
       ITaskAssignmentEligibilityChecker.cs
       TaskAssignmentEligibilityResult.cs
 
 be/Modules/Session/
-  PCL.Modules.Session.Application.Contracts/
+  PCL.Modules.Session.Contracts/
 ```
 
 Avoid putting all module contracts into one global project by default:
@@ -166,21 +166,21 @@ Task Planning owns task eligibility.
 Therefore:
 
 ```text
-TaskPlanning.Application.Contracts
+TaskPlanning.Contracts
   contains ITaskAssignmentEligibilityChecker
 
 TaskPlanning.Application
   implements ITaskAssignmentEligibilityChecker
 
 Session.Application
-  references TaskPlanning.Application.Contracts
+  references TaskPlanning.Contracts
 ```
 
 Allowed:
 
 ```text
-Session.Application -> TaskPlanning.Application.Contracts
-TaskPlanning.Application -> TaskPlanning.Application.Contracts
+Session.Application -> TaskPlanning.Contracts
+TaskPlanning.Application -> TaskPlanning.Contracts
 Host -> wires implementation with dependency injection
 ```
 
@@ -199,7 +199,7 @@ Session.Domain -> TaskPlanning.*
 Project names:
 
 ```text
-PCL.Modules.{ModuleName}.Application.Contracts
+PCL.Modules.{ModuleName}.Contracts
 ```
 
 Contract interface names should describe a narrow use case:

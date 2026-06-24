@@ -10,7 +10,7 @@
     <ProjectReference Include="..\..\..\Common\Common.Application\Common.Application.csproj" />
     <ProjectReference Include="..\PCL.Modules.Evidence.Contracts\PCL.Modules.Evidence.Contracts.csproj" />
     <ProjectReference Include="..\PCL.Modules.Evidence.Domain\PCL.Modules.Evidence.Domain.csproj" />
-    <ProjectReference Include="..\..\Session\PCL.Modules.Session.Application.Contracts\PCL.Modules.Session.Contracts.csproj" />
+    <ProjectReference Include="..\..\Session\PCL.Modules.Session.Contracts\PCL.Modules.Session.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

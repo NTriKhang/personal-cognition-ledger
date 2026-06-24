@@ -37,9 +37,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCL.Modules.TaskPlanning.In
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCL.Modules.TaskPlanning.Presentation", "..\Modules\TaskPlanning\PCL.Modules.TaskPlanning.Presentation\PCL.Modules.TaskPlanning.Presentation.csproj", "{02AD9E48-E8A9-4C24-8388-CDA0B6BF1A3A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCL.Modules.TaskPlanning.Contracts", "..\Modules\TaskPlanning\PCL.Modules.TaskPlanning.Application.Contracts\PCL.Modules.TaskPlanning.Contracts.csproj", "{638D399E-32F7-4423-AC12-9B7E1C4491EC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCL.Modules.TaskPlanning.Contracts", "..\Modules\TaskPlanning\PCL.Modules.TaskPlanning.Contracts\PCL.Modules.TaskPlanning.Contracts.csproj", "{638D399E-32F7-4423-AC12-9B7E1C4491EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCL.Modules.Session.Contracts", "..\Modules\Session\PCL.Modules.Session.Application.Contracts\PCL.Modules.Session.Contracts.csproj", "{8419B2DB-B8F8-4259-9A3A-A695029C5AEC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PCL.Modules.Session.Contracts", "..\Modules\Session\PCL.Modules.Session.Contracts\PCL.Modules.Session.Contracts.csproj", "{8419B2DB-B8F8-4259-9A3A-A695029C5AEC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Evidence", "Evidence", "{6F071EF3-D458-48F7-9BBA-24BB229C11A5}"
 EndProject

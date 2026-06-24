@@ -4,6 +4,7 @@ using Common.Presentation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using PCL.Modules.Evidence.Application.EvidenceItems.RemoveEvidenceItem;
 
@@ -16,7 +17,7 @@ internal sealed class RemoveEvidenceItem : IEndpoint
         app.MapDelete("lsessions/{sessionId:guid}/evidence-items/{evidenceItemId:guid}", async (
             Guid sessionId,
             Guid evidenceItemId,
-            RemoveEvidenceItemRequest request,
+            [FromBody] RemoveEvidenceItemRequest request,
             ISender sender) =>
         {
             var command = new RemoveEvidenceItemCommand(

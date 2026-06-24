@@ -1,0 +1,43 @@
+@baseUrl = http://localhost:5266
+@ownerId = 11111111-1111-1111-1111-111111111111
+@sessionId = replace-with-session-id
+@taskId = replace-with-planned-task-id
+
+### Start session
+POST {{baseUrl}}/lsessions
+Content-Type: application/json
+
+{
+  "id": null,
+  "ownerId": "{{ownerId}}",
+  "title": "Manual API verification",
+  "startedAt": "2026-06-24T14:00:00Z"
+}
+
+### List sessions
+GET {{baseUrl}}/lsessions
+Accept: application/json
+
+### Get session
+GET {{baseUrl}}/lsessions/{{sessionId}}
+Accept: application/json
+
+### Assign a Planned or Active task
+PUT {{baseUrl}}/lsessions/{{sessionId}}/tasks/{{taskId}}
+Content-Type: application/json
+
+{
+  "assignedAt": null
+}
+
+### Remove task assignment
+DELETE {{baseUrl}}/lsessions/{{sessionId}}/tasks/{{taskId}}
+
+### End session
+PUT {{baseUrl}}/lsessions/{{sessionId}}/end
+Content-Type: application/json
+
+{
+  "endedAt": "2026-06-24T15:00:00Z"
+}
+

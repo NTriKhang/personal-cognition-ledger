@@ -1,0 +1,118 @@
+@baseUrl = http://localhost:5266
+@ownerId = 11111111-1111-1111-1111-111111111111
+@otherOwnerId = 99999999-9999-9999-9999-999999999999
+@sessionId = replace-with-active-session-id
+@evidenceItemId = replace-with-evidence-item-id
+@storageProfileId = replace-with-storage-profile-id
+
+### Add Note evidence (type 1)
+POST {{baseUrl}}/lsessions/{{sessionId}}/evidence-items
+Content-Type: application/json
+
+{
+  "ownerId": "{{ownerId}}",
+  "type": 1,
+  "content": "Documented the current API behavior.",
+  "addedAt": null
+}
+
+### Add Link evidence (type 2)
+POST {{baseUrl}}/lsessions/{{sessionId}}/evidence-items
+Content-Type: application/json
+
+{
+  "ownerId": "{{ownerId}}",
+  "type": 2,
+  "content": "https://example.com/reference",
+  "addedAt": null
+}
+
+### Invalid Link - expect 400
+POST {{baseUrl}}/lsessions/{{sessionId}}/evidence-items
+Content-Type: application/json
+
+{
+  "ownerId": "{{ownerId}}",
+  "type": 2,
+  "content": "not-a-url",
+  "addedAt": null
+}
+
+### FileReference through generic endpoint - expect 409
+POST {{baseUrl}}/lsessions/{{sessionId}}/evidence-items
+Content-Type: application/json
+
+{
+  "ownerId": "{{ownerId}}",
+  "type": 3,
+  "content": "file caption",
+  "addedAt": null
+}
+
+### List active evidence
+GET {{baseUrl}}/lsessions/{{sessionId}}/evidence-items?ownerId={{ownerId}}&includeRemoved=false
+Accept: application/json
+
+### List including removed evidence
+GET {{baseUrl}}/lsessions/{{sessionId}}/evidence-items?ownerId={{ownerId}}&includeRemoved=true
+Accept: application/json
+
+### Remove evidence
+DELETE {{baseUrl}}/lsessions/{{sessionId}}/evidence-items/{{evidenceItemId}}
+Content-Type: application/json
+
+{
+  "ownerId": "{{ownerId}}",
+  "removedAt": null,
+  "removalReason": "Duplicate note."
+}
+
+### Wrong-owner removal - expect 409
+DELETE {{baseUrl}}/lsessions/{{sessionId}}/evidence-items/{{evidenceItemId}}
+Content-Type: application/json
+
+{
+  "ownerId": "{{otherOwnerId}}",
+  "removedAt": null,
+  "removalReason": "Ownership check."
+}
+
+### Create Local storage profile
+POST {{baseUrl}}/admin/evidence-storage/profiles/local
+Content-Type: application/json
+
+{
+  "name": "Development local storage",
+  "rootDirectory": "D:\\PCL\\Evidence"
+}
+
+### Create Amazon S3 profile (requires configured AWS identity)
+POST {{baseUrl}}/admin/evidence-storage/profiles/amazon-s3
+Content-Type: application/json
+
+{
+  "name": "Development S3",
+  "bucketName": "replace-with-bucket",
+  "region": "ap-southeast-1",
+  "keyPrefix": "pcl/evidence"
+}
+
+### List storage profiles
+GET {{baseUrl}}/admin/evidence-storage/profiles
+Accept: application/json
+
+### Test storage profile
+POST {{baseUrl}}/admin/evidence-storage/profiles/{{storageProfileId}}/test
+
+### Select active storage profile
+PUT {{baseUrl}}/admin/evidence-storage/settings/active-profile
+Content-Type: application/json
+
+{
+  "storageProfileId": "{{storageProfileId}}"
+}
+
+### Get storage settings
+GET {{baseUrl}}/admin/evidence-storage/settings
+Accept: application/json
+

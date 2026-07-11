@@ -10,9 +10,7 @@ internal sealed class AddEvidenceItemCommandValidator : AbstractValidator<AddEvi
         RuleFor(command => command.SessionId).NotEmpty();
         RuleFor(command => command.OwnerId).NotEmpty();
         RuleFor(command => command.Type)
-            .IsInEnum()
-            .NotEqual(EvidenceItemType.FileReference)
-            .WithMessage("File evidence must be created through the file upload initialization workflow.");
+            .IsInEnum();
         RuleFor(command => command.Content)
             .NotEmpty()
             .MaximumLength(EvidenceItem.MaximumContentLength);

@@ -29,33 +29,37 @@ Automated by `PCL_API.IntegrationTests/TaskPlanning` (Milestone 2):
 
 ## Session and task assignment
 
-- [ ] Start a Session; capture `sessionId`.
-- [ ] Attempt a second Active Session for the same owner and expect `409`.
-- [ ] Get and list Sessions.
-- [ ] Assign a Planned task.
-- [ ] Assign it again and expect `409`.
-- [ ] Wait for outbox/inbox processing and confirm the task status becomes `"Active"`.
-- [ ] Try assigning a task owned by another owner and expect `409`.
-- [ ] Remove the task assignment.
-- [ ] Remove it again and confirm idempotent `204`.
-- [ ] End the Session.
-- [ ] End it again and expect `400`.
-- [ ] Attempt assignment after ending and expect `400`.
+Automated by `PCL_API.IntegrationTests/Session` (Milestone 3):
+
+- [x] Start a Session; capture `sessionId`. (`SessionQueryTests`)
+- [x] Attempt a second Active Session for the same owner and expect `409`. (`SessionLifecycleTests`)
+- [x] Get and list Sessions. (`SessionQueryTests`)
+- [x] Assign a Planned task. (`SessionTaskAssignmentTests`)
+- [x] Assign it again and expect `409`. (`SessionTaskAssignmentTests`)
+- [ ] Wait for outbox/inbox processing and confirm the task status becomes `"Active"`. (Deferred to Milestone 6.)
+- [x] Try assigning a task owned by another owner and expect `409`. (`SessionTaskAssignmentTests`)
+- [x] Remove the task assignment. (`SessionTaskAssignmentTests`)
+- [x] Remove it again and confirm idempotent `204`. (`SessionTaskAssignmentTests`)
+- [x] End the Session. (`SessionLifecycleTests`)
+- [x] End it again and expect `400`. (`SessionLifecycleTests`)
+- [x] Attempt assignment after ending and expect `400`. (`SessionTaskAssignmentTests`)
 
 ## Evidence items
 
-- [ ] Start a fresh Active Session.
-- [ ] Add Note evidence; capture `evidenceItemId`.
-- [ ] Add a valid HTTPS Link.
-- [ ] Add an invalid Link and expect `400`.
-- [ ] Attempt generic FileReference creation and expect `409`.
-- [ ] List evidence and confirm both valid items.
-- [ ] Remove one item.
-- [ ] List with `includeRemoved=false` and confirm it is absent.
-- [ ] List with `includeRemoved=true` and confirm removal metadata.
-- [ ] Attempt removal using another owner and expect `409`.
-- [ ] End the Session.
-- [ ] Attempt to add evidence and expect `409`.
+Automated by `PCL_API.IntegrationTests/Evidence` (Milestone 4):
+
+- [x] Start a fresh Active Session. (`EvidenceItemTests`)
+- [x] Add Note evidence; capture `evidenceItemId`. (`EvidenceItemTests`)
+- [x] Add a valid HTTPS Link. (`EvidenceItemTests`)
+- [x] Add an invalid Link and expect `400`. (`EvidenceItemTests`)
+- [x] Attempt generic FileReference creation and expect `409`. (`EvidenceItemTests`)
+- [x] List evidence and confirm both valid items. (`EvidenceItemTests`)
+- [x] Remove one item. (`EvidenceItemTests`)
+- [x] List with `includeRemoved=false` and confirm it is absent. (`EvidenceItemTests`)
+- [x] List with `includeRemoved=true` and confirm removal metadata. (`EvidenceItemTests`)
+- [x] Attempt removal using another owner and expect `409`. (`EvidenceItemTests`)
+- [x] End the Session. (`EvidenceItemTests`)
+- [x] Attempt to add evidence and expect `409`. (`EvidenceItemTests`)
 
 ## Evidence storage
 

@@ -81,7 +81,16 @@ The conceptual roles map to the current 構成 as follows:
 | Test data | `TestDataBuilder` request factories |
 | Contract assertions | Typed response models, xUnit assertions, and `ProblemDetailsAssertions` |
 
-Feature tests are grouped by capability and behavior. `Foundation` verifies the test environment itself; `TaskPlanning` contains query, organization, and lifecycle scenarios. New capabilities should follow the same feature-oriented organization.
+Feature tests are grouped by capability and behavior. `Foundation` verifies the test environment itself; `TaskPlanning`, `Session`, and `Evidence` contain capability-focused query, lifecycle, assignment, and evidence-item scenarios. New capabilities should follow the same feature-oriented organization.
+
+Current automated milestones:
+
+- Milestone 1: shared test foundation and isolation smoke tests.
+- Milestone 2: all 12 Task Planning endpoints.
+- Milestone 3: all 6 Session endpoints, including task-assignment rules.
+- Milestone 4: all 3 Evidence Item endpoints, including soft removal.
+
+注意: Outbox-driven cross-module state changes remain part of Milestone 6. Session assignment tests assert the Session's HTTP contract without waiting for Task activation.
 
 ## Adding an integration test
 
@@ -91,6 +100,8 @@ Feature tests are grouped by capability and behavior. `Foundation` verifies the 
 4. Assert the HTTP status and the meaningful response contract or externally visible state.
 5. Add reusable valid request data to `TestDataBuilder`; keep invalid values in the test that explains them.
 6. Add test-owned response models when strongly typed deserialization improves clarity.
+
+Direct database setup is reserved for states that public HTTP cannot create. For example, the Session suite seeds two Active Sessions for one owner only to exercise the otherwise unreachable cross-session assignment guard.
 
 Recommended conventions:
 

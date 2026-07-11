@@ -6,14 +6,21 @@ public static class TestDataBuilder
 
     public static object StartSessionRequest(
         Guid ownerId,
-        string title = "Integration test session") =>
+        string title = "Integration test session",
+        DateTimeOffset? startedAt = null) =>
         new
         {
             Id = (Guid?)null,
             OwnerId = ownerId,
             Title = title,
-            StartedAt = DateTimeOffset.UtcNow
+            StartedAt = startedAt ?? DateTimeOffset.UtcNow
         };
+
+    public static object EndSessionRequest(DateTimeOffset? endedAt = null) =>
+        new { EndedAt = endedAt ?? DateTimeOffset.UtcNow };
+
+    public static object AssignTaskRequest(DateTimeOffset? assignedAt = null) =>
+        new { AssignedAt = assignedAt };
 
     public static object DraftTaskRequest(
         Guid ownerId,
@@ -55,12 +62,25 @@ public static class TestDataBuilder
 
     public static object AddNoteEvidenceRequest(
         Guid ownerId,
-        string content = "Integration test evidence") =>
+        string content = "Integration test evidence",
+        DateTimeOffset? addedAt = null) =>
         new
         {
             OwnerId = ownerId,
             Type = 1,
             Content = content,
-            AddedAt = DateTimeOffset.UtcNow
+            AddedAt = addedAt ?? DateTimeOffset.UtcNow
         };
+
+    public static object AddLinkEvidenceRequest(
+        Guid ownerId,
+        string content = "https://example.com/evidence",
+        DateTimeOffset? addedAt = null) =>
+        new { OwnerId = ownerId, Type = 2, Content = content, AddedAt = addedAt ?? DateTimeOffset.UtcNow };
+
+    public static object RemoveEvidenceRequest(
+        Guid ownerId,
+        DateTimeOffset? removedAt = null,
+        string? removalReason = null) =>
+        new { OwnerId = ownerId, RemovedAt = removedAt, RemovalReason = removalReason };
 }

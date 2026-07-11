@@ -38,7 +38,7 @@ flowchart LR
 
 Integration tests are most valuable when important technical boundaries remain real. This suite uses a disposable PostgreSQL container, applies the real EF Core migrations, and performs database operations through the application.
 
-External or asynchronous dependencies may be replaced when using the real provider would make tests slow, unsafe, or nondeterministic. These replacements are **fakes**, not mocks of internal business behavior. For example, the current 実装 replaces Amazon S3 verification and event publication while keeping the database and HTTP pipeline real.
+External dependencies may be replaced when using the real provider would make tests slow, unsafe, or nondeterministic. These replacements are **fakes**, not mocks of internal business behavior. For example, the current implementation replaces Amazon S3 verification while keeping the database, HTTP pipeline, in-memory event bus, outbox, and inbox real.
 
 ### Shared Fixture pattern
 
@@ -77,11 +77,11 @@ The conceptual roles map to the current 構成 as follows:
 | Shared fixture | `IntegrationTestCollection` and `IntegrationTestFixture` |
 | Per-test isolation | `IntegrationTestBase` invokes Respawn before each test |
 | Real infrastructure | PostgreSQL 17 through Testcontainers and real EF Core migrations |
-| Controlled boundaries | `TestEventBus` and `FakeS3StorageProfileVerifier` |
+| Controlled boundaries | `FakeS3StorageProfileVerifier` |
 | Test data | `TestDataBuilder` request factories |
 | Contract assertions | Typed response models, xUnit assertions, and `ProblemDetailsAssertions` |
 
-Feature tests are grouped by capability and behavior. `Foundation` verifies the test environment itself; `TaskPlanning`, `Session`, and `Evidence` contain capability-focused query, lifecycle, assignment, and evidence-item scenarios. New capabilities should follow the same feature-oriented organization.
+Feature tests are grouped by capability and behavior. `Foundation` verifies the test environment itself; `TaskPlanning`, `Session`, and `Evidence` contain capability-focused scenarios; `Flows` verifies behavior spanning modules. New capabilities should follow the same feature-oriented organization.
 
 Current automated milestones:
 
@@ -89,8 +89,10 @@ Current automated milestones:
 - Milestone 2: all 12 Task Planning endpoints.
 - Milestone 3: all 6 Session endpoints, including task-assignment rules.
 - Milestone 4: all 3 Evidence Item endpoints, including soft removal.
+- Milestone 5: all 6 Evidence storage endpoints, including real Local verification and fake S3 outcomes.
+- Milestone 6: cross-module Task, Session, and Evidence flows with deterministic message processing.
 
-注意: Outbox-driven cross-module state changes remain part of Milestone 6. Session assignment tests assert the Session's HTTP contract without waiting for Task activation.
+注意: `IntegrationMessageProcessor` can explicitly run any configured module's outbox or inbox job. Flow tests compose the relevant module route and use bounded polling instead of waiting for the normal scheduler interval.
 
 ## Adding an integration test
 
@@ -111,7 +113,9 @@ Recommended conventions:
 - Use `ProblemDetailsAssertions` for API error contracts.
 - Pass `TestContext.Current.CancellationToken` to asynchronous HTTP operations.
 - Do not manually clean the database or rely on another test's output.
-- Reset configurable fake state if a test changes it. 現在, database reset clears `TestEventBus`, but does not reset `FakeS3StorageProfileVerifier.ShouldSucceed`.
+- Configurable fake state is reset with the database. A test may change `FakeS3StorageProfileVerifier.ShouldSucceed` after arranging a valid S3 profile.
+- Storage tests must create Local profiles beneath `Fixture.LocalStorageRoot`; never write to persistent developer directories.
+- Cross-module tests should compose `Fixture.Messages` operations with validated `MessageStore` values. Module routing belongs in the flow test, not the shared fixture.
 
 ## Running the suite
 

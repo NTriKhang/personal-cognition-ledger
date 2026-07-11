@@ -83,4 +83,19 @@ public static class TestDataBuilder
         DateTimeOffset? removedAt = null,
         string? removalReason = null) =>
         new { OwnerId = ownerId, RemovedAt = removedAt, RemovalReason = removalReason };
+
+    public static object CreateLocalStorageProfileRequest(
+        string rootDirectory,
+        string name = "Integration Local Storage") =>
+        new { Name = name, RootDirectory = rootDirectory };
+
+    public static object CreateS3StorageProfileRequest(
+        string name = "Integration S3 Storage",
+        string bucketName = "pcl-integration-tests",
+        string region = "ap-southeast-1",
+        string? keyPrefix = "evidence/tests") =>
+        new { Name = name, BucketName = bucketName, Region = region, KeyPrefix = keyPrefix };
+
+    public static object SelectActiveStorageProfileRequest(Guid storageProfileId) =>
+        new { StorageProfileId = storageProfileId };
 }

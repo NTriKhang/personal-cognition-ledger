@@ -1,4 +1,3 @@
-using Common.Application.EventBus;
 using Common.Domain;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -56,11 +55,6 @@ public sealed class PclApiFactory(
             services.AddSingleton(
                 new NpgsqlDataSourceBuilder(databaseConnectionString).Build());
 
-            services.RemoveAll<IEventBus>();
-            services.AddSingleton<TestEventBus>();
-            services.AddSingleton<IEventBus>(
-                provider => provider.GetRequiredService<TestEventBus>());
-
             ServiceDescriptor? s3Verifier = services.SingleOrDefault(
                 descriptor =>
                     descriptor.ServiceType == typeof(IEvidenceStorageProfileVerifier) &&
@@ -78,26 +72,6 @@ public sealed class PclApiFactory(
     }
 }
 
-public sealed class TestEventBus : IEventBus
-{
-    private readonly List<IIntegrationEvent> _publishedEvents = [];
-
-    public IReadOnlyCollection<IIntegrationEvent> PublishedEvents =>
-        _publishedEvents.AsReadOnly();
-
-    public Task PublishAsync<T>(
-        T integrationEvent,
-        CancellationToken cancellationToken = default)
-        where T : IIntegrationEvent
-    {
-        _publishedEvents.Add(integrationEvent);
-
-        return Task.CompletedTask;
-    }
-
-    public void Clear() => _publishedEvents.Clear();
-}
-
 public sealed class FakeS3StorageProfileVerifier
     : IEvidenceStorageProfileVerifier
 {
@@ -105,6 +79,8 @@ public sealed class FakeS3StorageProfileVerifier
         EvidenceStorageProviderType.AmazonS3;
 
     public bool ShouldSucceed { get; set; } = true;
+
+    public void Reset() => ShouldSucceed = true;
 
     public Task<Result> VerifyAsync(
         StorageProfile storageProfile,

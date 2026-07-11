@@ -4,6 +4,7 @@ using Npgsql;
 using PCL.Modules.Evidence.Infrastructure.Database;
 using PCL.Modules.Session.Infrastructure.Database;
 using PCL.Modules.TaskPlanning.Infrastructure.Database;
+using PCL_API.IntegrationTests.Infrastructure.Messaging;
 using Respawn;
 using Testcontainers.PostgreSql;
 using Xunit;
@@ -24,6 +25,7 @@ public sealed class IntegrationTestFixture : IAsyncLifetime
 
     public PclApiFactory Factory { get; private set; } = null!;
     public HttpClient Client { get; private set; } = null!;
+    public IntegrationMessageProcessor Messages { get; private set; } = null!;
     public string LocalStorageRoot { get; private set; } = string.Empty;
 
     public async ValueTask InitializeAsync()
@@ -42,6 +44,9 @@ public sealed class IntegrationTestFixture : IAsyncLifetime
             LocalStorageRoot);
 
         Client = Factory.CreateClient();
+        Messages = new IntegrationMessageProcessor(
+            _database.GetConnectionString(),
+            Factory.Services.GetRequiredService<Quartz.ISchedulerFactory>());
 
         await ApplyMigrationsAsync();
 
@@ -78,8 +83,8 @@ public sealed class IntegrationTestFixture : IAsyncLifetime
         await _respawner.ResetAsync(connection);
 
         Factory.Services
-            .GetRequiredService<TestEventBus>()
-            .Clear();
+            .GetRequiredService<FakeS3StorageProfileVerifier>()
+            .Reset();
     }
 
     public async ValueTask DisposeAsync()
@@ -118,4 +123,5 @@ public sealed class IntegrationTestFixture : IAsyncLifetime
             .Database
             .MigrateAsync();
     }
+
 }

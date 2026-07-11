@@ -36,7 +36,7 @@ Automated by `PCL_API.IntegrationTests/Session` (Milestone 3):
 - [x] Get and list Sessions. (`SessionQueryTests`)
 - [x] Assign a Planned task. (`SessionTaskAssignmentTests`)
 - [x] Assign it again and expect `409`. (`SessionTaskAssignmentTests`)
-- [ ] Wait for outbox/inbox processing and confirm the task status becomes `"Active"`. (Deferred to Milestone 6.)
+- [x] Process the outbox/inbox and confirm the task status becomes `"Active"`. (`CrossModuleFlowTests`)
 - [x] Try assigning a task owned by another owner and expect `409`. (`SessionTaskAssignmentTests`)
 - [x] Remove the task assignment. (`SessionTaskAssignmentTests`)
 - [x] Remove it again and confirm idempotent `204`. (`SessionTaskAssignmentTests`)
@@ -63,15 +63,28 @@ Automated by `PCL_API.IntegrationTests/Evidence` (Milestone 4):
 
 ## Evidence storage
 
-- [ ] Create a Local profile under an allowed root.
-- [ ] Reuse its name and expect `409`.
-- [ ] Create a Local profile outside allowed roots and expect `400`.
-- [ ] List profiles.
-- [ ] Test a valid profile.
-- [ ] Test a missing profile and expect `404`.
-- [ ] Select a valid profile.
-- [ ] Get settings and verify the active profile.
-- [ ] If AWS is configured, repeat create/test/select for Amazon S3.
+Automated by `PCL_API.IntegrationTests/Evidence` (Milestone 5):
+
+- [x] Create a Local profile under an allowed root. (`EvidenceStorageProfileTests`)
+- [x] Reuse its name and expect `409`. (`EvidenceStorageProfileTests`)
+- [x] Create a Local profile outside allowed roots and expect `400`. (`EvidenceStorageProfileTests`)
+- [x] Reject an unavailable Local directory. (`EvidenceStorageProfileTests`)
+- [x] List profiles. (`EvidenceStorageProfileTests`)
+- [x] Test a valid profile. (`EvidenceStorageProfileTests`)
+- [x] Test a missing profile and expect `404`. (`EvidenceStorageProfileTests`)
+- [x] Select a valid profile. (`EvidenceStorageProfileTests`)
+- [x] Get settings and verify the active profile. (`EvidenceStorageProfileTests`)
+- [x] Create, test, and select Amazon S3 profiles through the configurable verifier. (`EvidenceStorageProfileTests`)
+- [x] Confirm failed S3 verification prevents selection. (`EvidenceStorageProfileTests`)
+
+## Cross-module flows
+
+Automated by `PCL_API.IntegrationTests/Flows` (Milestone 6):
+
+- [x] Assign a Planned task and verify eventual activation through explicit outbox/inbox processing. (`CrossModuleFlowTests`)
+- [x] Remove the assignment and confirm the task remains Active. (`CrossModuleFlowTests`)
+- [x] Add Evidence during an Active Session and reject it after the Session stops. (`CrossModuleFlowTests`)
+- [x] Complete a Task and stop its Session independently. (`CrossModuleFlowTests`)
 
 ## Documentation maintenance
 

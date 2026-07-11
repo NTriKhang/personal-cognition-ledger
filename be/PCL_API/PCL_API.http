@@ -2,7 +2,7 @@
 # ../../docs/api/requests/
 #
 # Start with:
-# ../../docs/api/README.md
+# ../../docs/api/reference.md
 
 @baseUrl = http://localhost:5266
 

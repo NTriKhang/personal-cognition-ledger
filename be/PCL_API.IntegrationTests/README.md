@@ -17,7 +17,7 @@ Within the **Testing Pyramid**, this suite belongs to the integration layer:
 - Broader and slower than unit tests because it crosses process-internal boundaries and uses PostgreSQL.
 - Narrower and faster than end-to-end tests because the API runs in-process and external providers are not contacted.
 
-注意: These tests complement unit and end-to-end tests; they do not replace either level.
+These tests complement unit and end-to-end tests; they do not replace either level.
 
 ### Test Host pattern
 
@@ -46,7 +46,7 @@ Starting an application host and database for every test is expensive. The **Sha
 
 Shared infrastructure must not imply shared scenario state. Respawn clears application tables before every test while preserving migration history. Test parallelism is disabled because the suite currently shares one database and mutable test doubles.
 
-重要: Every test must create its own prerequisites and remain independent of execution order.
+Every test must create its own prerequisites and remain independent of execution order.
 
 ### Test Infrastructure layer
 
@@ -64,11 +64,11 @@ Request data uses the **Test Data Builder pattern**, adapted here as static fact
 
 This keeps setup concise and makes invalid input deliberate. It is not currently a fluent builder API; `TestDataBuilder` is a lightweight variation of the pattern.
 
-例: a lifecycle test can request a valid draft-task body, changing only its owner or timestamp.
+For example, a lifecycle test can request a valid draft-task body, changing only its owner or timestamp.
 
 ## How this project applies the architecture
 
-The conceptual roles map to the current 構成 as follows:
+The conceptual roles map to the current implementation as follows:
 
 | Architectural role | Project implementation |
 |---|---|
@@ -83,16 +83,9 @@ The conceptual roles map to the current 構成 as follows:
 
 Feature tests are grouped by capability and behavior. `Foundation` verifies the test environment itself; `TaskPlanning`, `Session`, and `Evidence` contain capability-focused scenarios; `Flows` verifies behavior spanning modules. New capabilities should follow the same feature-oriented organization.
 
-Current automated milestones:
+Current automated coverage includes the shared test foundation, all 27 mapped endpoints across Task Planning, Session, and Evidence, and the principal cross-module Task/Session/Evidence flows.
 
-- Milestone 1: shared test foundation and isolation smoke tests.
-- Milestone 2: all 12 Task Planning endpoints.
-- Milestone 3: all 6 Session endpoints, including task-assignment rules.
-- Milestone 4: all 3 Evidence Item endpoints, including soft removal.
-- Milestone 5: all 6 Evidence storage endpoints, including real Local verification and fake S3 outcomes.
-- Milestone 6: cross-module Task, Session, and Evidence flows with deterministic message processing.
-
-注意: `IntegrationMessageProcessor` can explicitly run any configured module's outbox or inbox job. Flow tests compose the relevant module route and use bounded polling instead of waiting for the normal scheduler interval.
+`IntegrationMessageProcessor` can explicitly run any configured module's outbox or inbox job. Flow tests compose the relevant module route and use bounded polling instead of waiting for the normal scheduler interval.
 
 ## Adding an integration test
 
@@ -138,4 +131,4 @@ Or run the complete solution:
 dotnet test PCL_API.sln
 ```
 
-If the fixture reports `DockerUnavailableException`, confirm that Docker is running and accessible, then try again. 確認してください.
+If the fixture reports `DockerUnavailableException`, confirm that Docker is running and accessible, then try again.

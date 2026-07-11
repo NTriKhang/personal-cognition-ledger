@@ -11,19 +11,21 @@ Use a fresh owner UUID for a clean pass. Run the matching requests from `docs/ap
 
 ## Task Planning
 
-- [ ] Draft a task; capture `taskId`.
-- [ ] Get the task with the correct owner.
-- [ ] Get with another owner and expect `404`.
-- [ ] Refine title/description.
-- [ ] Set category and priority.
-- [ ] Plan the task.
-- [ ] Confirm it appears in `/tasks/assignable`.
-- [ ] Activate, defer, and confirm it returns to Planned.
-- [ ] Complete a Planned task.
-- [ ] Attempt to mutate the completed task and expect `409`.
-- [ ] Cancel a separate Draft task.
-- [ ] Activate a separate task, cancel without reason, and expect `400`.
-- [ ] Exercise list filters: status, category, priority, search, and creation range.
+Automated by `PCL_API.IntegrationTests/TaskPlanning` (Milestone 2):
+
+- [x] Draft a task; capture `taskId`. (`TaskPlanningQueryTests`)
+- [x] Get the task with the correct owner. (`TaskPlanningQueryTests`)
+- [x] Get with another owner and expect `404`. (`TaskPlanningQueryTests`)
+- [x] Refine title/description. (`TaskPlanningOrganizationTests`)
+- [x] Set category and priority. (`TaskPlanningOrganizationTests`)
+- [x] Plan the task. (`TaskPlanningLifecycleTests`)
+- [x] Confirm it appears in `/tasks/assignable`. (`TaskPlanningQueryTests`)
+- [x] Activate, defer, and confirm it returns to Planned. (`TaskPlanningLifecycleTests`)
+- [x] Complete a Planned task. (`TaskPlanningLifecycleTests`)
+- [x] Attempt to mutate the completed task and expect `409`. (`TaskPlanningLifecycleTests`)
+- [x] Cancel a separate Draft task. (`TaskPlanningLifecycleTests`)
+- [x] Activate a separate task, cancel without reason, and expect `400`. (`TaskPlanningLifecycleTests`)
+- [x] Exercise list filters: status, category, priority, search, and creation range. (`TaskPlanningQueryTests`)
 
 ## Session and task assignment
 

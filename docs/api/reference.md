@@ -357,6 +357,15 @@ Bucket, region, and optional normalized prefix are stored. Access is verified wi
 | `EvidenceItem.InvalidContent` | 400 | Content is missing or oversized |
 | `EvidenceItem.InvalidLink` | 400 | Link is not absolute HTTP/HTTPS |
 | `EvidenceItem.FileReferenceRequiresUploadInitialization` | 409 | FileReference used through generic add |
+| `EvidenceFile.IdempotencyKeyRequired` | 400 | Initialization omitted a valid `Idempotency-Key` header |
+| `EvidenceFile.IdempotencyKeyConflict` | 409 | The owner-scoped key was reused with different initialization data |
+| `EvidenceFile.UploadAttemptMismatch` | 409 | A stale or unrelated attempt ID was supplied |
+| `EvidenceFile.UploadExpired` | 409 | The upload target expired before confirmation |
+| `EvidenceFile.CannotRenew` | 409 | Renewal was requested outside Failed or Expired |
+| `EvidenceFile.CannotCancel` | 409 | Cancellation was requested outside Pending |
+| `EvidenceFile.ContentUploadRequired` | 409 | Confirmation found no stored object |
+| `EvidenceFile.MetadataMismatch` | 409 | Stored size, content type, or checksum differs from the reservation |
+| `EvidenceFile.NotReady` | 409 | Download was requested before verification completed |
 | `EvidenceItem.NotFound` | 404 | Item missing or in another route Session |
 | `EvidenceItem.OwnerMismatch` | 409 | Another owner attempted removal |
 | `StorageProfile.NameAlreadyExists` | 409 | Profile name is duplicated |
@@ -409,7 +418,7 @@ Create a Local or Amazon S3 profile, test it, select it, and read settings. New 
 - Created-response `Location` headers currently include `/api`, while mapped routes do not.
 - Session list/get routes are not owner-filtered.
 - Authentication and administrative authorization are disabled.
-- Interrupted-upload reconciliation, renewal, cancellation, and physical cleanup remain planned follow-up work.
+- File endpoints still accept caller-supplied owner IDs because authentication is disabled; they are not production authorization boundaries.
 
 These are documented current behaviors, not recommendations.
 

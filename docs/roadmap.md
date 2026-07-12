@@ -1,6 +1,6 @@
 # Roadmap
 
-Last reviewed: 2026-07-11
+Last reviewed: 2026-07-12
 
 This roadmap states current project status and priority. It is not a promise of release dates. Detailed design belongs in an active plan only after the next increment is approved.
 
@@ -25,15 +25,13 @@ Known baseline limitations:
 
 ## Current priority
 
-### Evidence file workflow
+### Production identity and authorization
 
-Status: implemented; production identity hardening remains
+Status: required before production exposure
 
 The FileReference workflow is implemented: idempotent reservation, Local API streaming or S3 direct upload, provider verification, status, download, renewal/cancellation, interrupted-upload reconciliation, and seven-day retention-based physical cleanup.
 
-Security identity must be addressed before file endpoints are considered production-ready. Until authentication exists, any implementation must remain explicitly development-only or carry the current security warning.
-
-The implementation sequence and completion conditions are in [Evidence file uploads](plans/evidence-file-uploads.md).
+Authentication-derived ownership and administrative authorization must be added before file and storage-administration endpoints are considered production-ready. Until then, caller-supplied owner IDs are domain inputs rather than a secure identity boundary.
 
 ## Near-term hardening
 
@@ -74,7 +72,7 @@ The following ideas are intentionally not designed in detail:
 - Session pause/resume or continuation relationships
 - recurring Tasks and Task templates
 - OCR, preview generation, and indexing
-- automated Evidence cleanup and retention policies beyond the file plan
+- provider-managed lifecycle rules for multipart remnants or storage versions
 - analytics, scoring, and behavioral metrics
 - AI summaries, friction detection, or learning insights
 - calendar integrations and collaboration

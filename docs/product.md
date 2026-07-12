@@ -46,14 +46,15 @@ The implemented backend currently supports:
 - recording Note and Link Evidence against an active Session
 - listing and soft-removing Evidence
 - configuring and verifying Local or Amazon S3 Evidence storage profiles
+- capturing FileReference Evidence through Local API streaming or direct Amazon S3 upload
+- idempotent file reservation, upload renewal/cancellation, interrupted-upload recovery, and retention-based cleanup
 - reliable asynchronous Task activation after Session assignment through outbox/inbox processing
-- HTTP integration coverage for all 32 mapped endpoints and principal cross-module flows
+- HTTP integration coverage for all 34 mapped endpoints and principal cross-module flows
 
 The current API does **not** enforce authentication or authorization. Owner IDs in requests are business ownership inputs, not a secure identity boundary.
 
 ## Explicitly not implemented
 
-- Evidence file-upload and download endpoints
 - frontend or administration UI
 - Session pause and resume
 - granular Activity tracking inside a Session
@@ -97,4 +98,4 @@ The first coherent product increment is complete when a user can:
 4. stop the Session independently of Task completion
 5. retrieve the resulting records reliably
 
-Storage profile administration is implemented in preparation for file Evidence. The file lifecycle itself remains the principal gap in that initial experience.
+The coherent backend product increment is implemented, including managed file Evidence. Production exposure remains blocked on authentication-derived ownership and administrative authorization.

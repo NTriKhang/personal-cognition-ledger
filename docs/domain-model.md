@@ -121,7 +121,7 @@ An EvidenceItem records proof or a meaningful trace associated with a Session. I
 | :--- | :--- | :--- |
 | Note | Free-form textual Evidence | Generic Evidence endpoint |
 | Link | Absolute HTTP or HTTPS reference | Generic Evidence endpoint |
-| FileReference | Evidence backed by a managed file lifecycle | Domain model exists; HTTP initialization is not implemented |
+| FileReference | Evidence backed by a managed file lifecycle | Dedicated file-upload initialization endpoint |
 
 ### EvidenceItem invariants
 
@@ -138,7 +138,7 @@ An EvidenceItem records proof or a meaningful trace associated with a Session. I
 
 ### EvidenceFile lifecycle
 
-The Evidence domain contains a file lifecycle, but no mapped HTTP workflow currently drives it:
+The mapped upload workflow drives this lifecycle:
 
 ```mermaid
 stateDiagram-v2
@@ -151,7 +151,7 @@ stateDiagram-v2
     Pending --> Cancelled
 ```
 
-The model records expected file metadata, checksum, storage identity, expiry, upload time, version, and failure information. Current domain limits include a 25 MiB maximum and an allowed content-type policy. The active implementation design is in [Evidence file uploads](plans/evidence-file-uploads.md).
+The model records expected file metadata, checksum, the selected storage-profile identity, expiry, upload time, version, and failure information. Current domain limits include a 25 MiB maximum, an allowed content-type policy, and a required Base64 SHA-256 checksum. Provider metadata verification is required before Ready.
 
 ### StorageProfile responsibility
 

@@ -1,6 +1,6 @@
 # HTTP API reference
 
-This document describes the 27 endpoints mapped by the current PCL API. Executable examples live in [`requests/`](requests/).
+This document describes the 32 endpoints mapped by the current PCL API. Executable examples live in [`requests/`](requests/).
 
 ## Runtime conventions
 
@@ -259,6 +259,11 @@ Evidence owns Session Evidence and deployment-level storage profiles.
 | POST | `/lsessions/{sessionId}/evidence-items` | Add Note or Link Evidence | `201`, Evidence ID |
 | GET | `/lsessions/{sessionId}/evidence-items` | List Session Evidence | `200`, array |
 | DELETE | `/lsessions/{sessionId}/evidence-items/{evidenceItemId}` | Soft-remove Evidence | `204` |
+| POST | `/lsessions/{sessionId}/evidence-items/file-uploads` | Initialize a file upload | `201` |
+| PUT | `/lsessions/{sessionId}/evidence-items/{evidenceItemId}/file-upload/content` | Upload Local file bytes | `204` |
+| POST | `/lsessions/{sessionId}/evidence-items/{evidenceItemId}/file-upload/confirm` | Verify an upload | `200` |
+| GET | `/lsessions/{sessionId}/evidence-items/{evidenceItemId}/file-upload` | Get upload status | `200` |
+| GET | `/lsessions/{sessionId}/evidence-items/{evidenceItemId}/file` | Download a Ready file | `200` or `302` |
 | POST | `/admin/evidence-storage/profiles/local` | Create and verify Local profile | `201`, profile ID |
 | POST | `/admin/evidence-storage/profiles/amazon-s3` | Create and verify S3 profile | `201`, profile ID |
 | GET | `/admin/evidence-storage/profiles` | List profiles | `200`, array |
@@ -283,6 +288,7 @@ Evidence owns Session Evidence and deployment-level storage profiles.
 - Note content is required and limited to 10,000 characters.
 - Link content is required, limited to 2,048 characters, and must be absolute HTTP/HTTPS.
 - Generic FileReference creation returns `EvidenceItem.FileReferenceRequiresUploadInitialization`.
+- Initialize FileReference Evidence with `ownerId`, optional `caption`, `originalFileName`, allowed `contentType`, `fileSizeBytes` (maximum 25 MiB), and a Base64 SHA-256 checksum. Local profiles return an `ApiProxy` PUT URL; Amazon S3 returns a `Direct` presigned PUT URL and required headers. Confirmation verifies provider size, content type, and checksum before status becomes `Ready`.
 - The current `Location` header incorrectly includes `/api`.
 
 `GET /lsessions/{sessionId}/evidence-items?ownerId={ownerId}&includeRemoved=false`
@@ -391,14 +397,14 @@ Remove the Task from an Active Session, then explicitly defer the Active Task. A
 
 ### Configure Evidence storage
 
-Create a Local or Amazon S3 profile, test it, select it, and read settings. Creation and selection both verify provider access. Storage profiles do not yet provide an HTTP file-upload workflow.
+Create a Local or Amazon S3 profile, test it, select it, and read settings. New file reservations capture the active profile, so later profile changes do not change where an existing EvidenceFile is read or verified.
 
 ## Known contract gaps
 
 - Created-response `Location` headers currently include `/api`, while mapped routes do not.
 - Session list/get routes are not owner-filtered.
 - Authentication and administrative authorization are disabled.
-- Evidence file domain behavior and storage profiles exist, but file initialization, upload, confirmation, download, and cleanup endpoints are not mapped.
+- Interrupted-upload reconciliation, renewal, cancellation, and physical cleanup remain planned follow-up work.
 
 These are documented current behaviors, not recommendations.
 

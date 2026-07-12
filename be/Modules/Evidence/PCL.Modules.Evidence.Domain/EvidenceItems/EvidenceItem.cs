@@ -1,4 +1,5 @@
 using Common.Domain;
+using PCL.Modules.Evidence.Domain.Storage;
 using PCL.Modules.Evidence.Domain.EvidenceItems.Events;
 
 namespace PCL.Modules.Evidence.Domain.EvidenceItems;
@@ -122,6 +123,7 @@ public sealed class EvidenceItem : Entity
 
     public Result InitializeFileUpload(
         EvidenceFileUploadAttemptId uploadAttemptId,
+        StorageProfileId storageProfileId,
         string objectKey,
         string originalFileName,
         string contentType,
@@ -143,6 +145,7 @@ public sealed class EvidenceItem : Entity
         Result<EvidenceFile> fileResult = EvidenceFile.CreatePending(
             Id,
             uploadAttemptId,
+            storageProfileId,
             objectKey,
             originalFileName,
             contentType,

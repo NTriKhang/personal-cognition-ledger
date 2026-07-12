@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PCL.Modules.Evidence.Domain.EvidenceItems;
+using PCL.Modules.Evidence.Domain.Storage;
 
 namespace PCL.Modules.Evidence.Infrastructure.EvidenceItems;
 
@@ -27,6 +28,15 @@ internal sealed class EvidenceFileConfiguration : IEntityTypeConfiguration<Evide
                 uploadAttemptId => uploadAttemptId.Value,
                 value => EvidenceFileUploadAttemptId.From(value))
             .ValueGeneratedNever();
+
+        builder.Property(evidenceFile => evidenceFile.StorageProfileId)
+            .HasConversion(id => id.Value, value => StorageProfileId.From(value))
+            .ValueGeneratedNever();
+
+        builder.HasOne<StorageProfile>()
+            .WithMany()
+            .HasForeignKey(evidenceFile => evidenceFile.StorageProfileId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.Property(evidenceFile => evidenceFile.ObjectKey)
             .HasMaxLength(EvidenceFile.MaximumObjectKeyLength)

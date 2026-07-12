@@ -14,6 +14,39 @@ public static class EvidenceFileErrors
             "EvidenceFile.InvalidUploadAttemptId",
             "UploadAttemptId cannot be empty.");
 
+    public static readonly Error InvalidStorageProfileId =
+        Error.Problem("EvidenceFile.InvalidStorageProfileId", "StorageProfileId cannot be empty.");
+
+    public static readonly Error StorageNotConfigured =
+        Error.Conflict("EvidenceFile.StorageNotConfigured", "An active evidence storage profile must be selected before uploading files.");
+
+    public static readonly Error NotFound =
+        Error.NotFound("EvidenceFile.NotFound", "The evidence file was not found.");
+
+    public static readonly Error OwnerMismatch =
+        Error.Conflict("EvidenceFile.OwnerMismatch", "The evidence file belongs to another owner.");
+
+    public static readonly Error SessionMismatch =
+        Error.NotFound("EvidenceFile.NotFound", "The evidence file was not found in this Session.");
+
+    public static readonly Error UploadExpired =
+        Error.Conflict("EvidenceFile.UploadExpired", "The upload attempt has expired.");
+
+    public static readonly Error DirectUploadRequired =
+        Error.Conflict("EvidenceFile.DirectUploadRequired", "This storage provider requires direct upload using the supplied URL.");
+
+    public static readonly Error ContentUploadRequired =
+        Error.Conflict("EvidenceFile.ContentUploadRequired", "Upload content before confirming the file.");
+
+    public static readonly Error MetadataMismatch =
+        Error.Conflict("EvidenceFile.MetadataMismatch", "Stored file metadata does not match the upload reservation.");
+
+    public static readonly Error NotReady =
+        Error.Conflict("EvidenceFile.NotReady", "The evidence file is not ready for download.");
+
+    public static readonly Error StorageUnavailable =
+        Error.Problem("EvidenceFile.StorageUnavailable", "The configured evidence storage provider is unavailable.");
+
     public static readonly Error InvalidObjectKey =
         Error.Problem(
             "EvidenceFile.InvalidObjectKey",

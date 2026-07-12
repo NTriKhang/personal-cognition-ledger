@@ -47,7 +47,7 @@ The implemented backend currently supports:
 - listing and soft-removing Evidence
 - configuring and verifying Local or Amazon S3 Evidence storage profiles
 - reliable asynchronous Task activation after Session assignment through outbox/inbox processing
-- HTTP integration coverage for all 27 mapped endpoints and principal cross-module flows
+- HTTP integration coverage for all 32 mapped endpoints and principal cross-module flows
 
 The current API does **not** enforce authentication or authorization. Owner IDs in requests are business ownership inputs, not a secure identity boundary.
 

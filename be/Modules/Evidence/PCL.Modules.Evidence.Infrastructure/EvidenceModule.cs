@@ -61,6 +61,10 @@ public static class EvidenceModule
             IEvidenceStorageProfileVerifierResolver,
             EvidenceStorageProfileVerifierResolver>();
 
+        services.AddScoped<IEvidenceFileStorage, LocalEvidenceFileStorage>();
+        services.AddScoped<IEvidenceFileStorage, S3EvidenceFileStorage>();
+        services.AddScoped<IEvidenceFileStorageResolver, EvidenceFileStorageResolver>();
+
         services.AddOptions<LocalEvidenceStorageOptions>()
             .Bind(configuration.GetSection(LocalEvidenceStorageOptions.SectionName))
             .Validate(

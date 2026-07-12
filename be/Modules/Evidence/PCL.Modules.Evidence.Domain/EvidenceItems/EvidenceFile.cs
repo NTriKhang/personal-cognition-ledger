@@ -1,4 +1,5 @@
 using Common.Domain;
+using PCL.Modules.Evidence.Domain.Storage;
 
 namespace PCL.Modules.Evidence.Domain.EvidenceItems;
 
@@ -14,6 +15,7 @@ public sealed class EvidenceFile
 
     public EvidenceItemId EvidenceItemId { get; private set; }
     public EvidenceFileUploadAttemptId UploadAttemptId { get; private set; }
+    public StorageProfileId StorageProfileId { get; private set; }
     public string ObjectKey { get; private set; } = string.Empty;
     public string OriginalFileName { get; private set; } = string.Empty;
     public string ContentType { get; private set; } = string.Empty;
@@ -35,6 +37,7 @@ public sealed class EvidenceFile
     internal static Result<EvidenceFile> CreatePending(
         EvidenceItemId evidenceItemId,
         EvidenceFileUploadAttemptId uploadAttemptId,
+        StorageProfileId storageProfileId,
         string objectKey,
         string originalFileName,
         string contentType,
@@ -49,6 +52,9 @@ public sealed class EvidenceFile
 
         if (uploadAttemptId.Value == Guid.Empty)
             return Result.Failure<EvidenceFile>(EvidenceFileErrors.InvalidUploadAttemptId);
+
+        if (storageProfileId.Value == Guid.Empty)
+            return Result.Failure<EvidenceFile>(EvidenceFileErrors.InvalidStorageProfileId);
 
         if (string.IsNullOrWhiteSpace(objectKey))
             return Result.Failure<EvidenceFile>(EvidenceFileErrors.InvalidObjectKey);
@@ -103,6 +109,7 @@ public sealed class EvidenceFile
         {
             EvidenceItemId = evidenceItemId,
             UploadAttemptId = uploadAttemptId,
+            StorageProfileId = storageProfileId,
             ObjectKey = normalizedObjectKey,
             OriginalFileName = normalizedOriginalFileName,
             ContentType = normalizedContentType,

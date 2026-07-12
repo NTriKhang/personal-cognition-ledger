@@ -133,7 +133,7 @@ The Evidence module owns storage-profile administration. Profiles describe deplo
 
 Provider-specific types remain in Infrastructure. Domain and Application code operate through PCL abstractions. AWS credentials are not stored in profiles or accepted through HTTP; the AWS SDK uses the process credential chain.
 
-Storage profile configuration exists, but file upload, confirmation, download, reconciliation, and cleanup endpoints are not yet mapped. See the active [Evidence file workflow plan](plans/evidence-file-uploads.md).
+FileReference Evidence uses the active storage profile through a provider-neutral Application contract. Local files stream through the API to a bounded temporary file before an atomic move; Amazon S3 uploads use short-lived presigned PUT requests. Provider metadata is verified before a file becomes Ready, and downloads are API streams for Local or short-lived presigned URLs for S3.
 
 ## API host
 

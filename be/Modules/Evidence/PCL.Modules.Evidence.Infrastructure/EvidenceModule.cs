@@ -15,6 +15,7 @@ using PCL.Modules.Evidence.Infrastructure.EvidenceItems;
 using PCL.Modules.Evidence.Infrastructure.Storage;
 using PCL.Modules.Evidence.Infrastructure.Storage.AmazonS3;
 using PCL.Modules.Evidence.Infrastructure.Storage.Local;
+using Quartz;
 
 namespace PCL.Modules.Evidence.Infrastructure;
 
@@ -64,6 +65,15 @@ public static class EvidenceModule
         services.AddScoped<IEvidenceFileStorage, LocalEvidenceFileStorage>();
         services.AddScoped<IEvidenceFileStorage, S3EvidenceFileStorage>();
         services.AddScoped<IEvidenceFileStorageResolver, EvidenceFileStorageResolver>();
+        services.Configure<QuartzOptions>(options =>
+        {
+            options.AddJob<ReconcileEvidenceFileUploadsJob>(x => x.WithIdentity("Evidence.FileUploadReconciliation"))
+                .AddTrigger(x => x.ForJob("Evidence.FileUploadReconciliation").WithIdentity("Evidence.FileUploadReconciliation.Trigger")
+                    .WithSimpleSchedule(s => s.WithIntervalInMinutes(1).RepeatForever()));
+            options.AddJob<CleanupEvidenceFilesJob>(x => x.WithIdentity("Evidence.FileCleanup"))
+                .AddTrigger(x => x.ForJob("Evidence.FileCleanup").WithIdentity("Evidence.FileCleanup.Trigger")
+                    .WithSimpleSchedule(s => s.WithIntervalInMinutes(1).RepeatForever()));
+        });
 
         services.AddOptions<LocalEvidenceStorageOptions>()
             .Bind(configuration.GetSection(LocalEvidenceStorageOptions.SectionName))

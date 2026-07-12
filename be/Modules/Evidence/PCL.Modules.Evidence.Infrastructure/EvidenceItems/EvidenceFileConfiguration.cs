@@ -73,6 +73,10 @@ internal sealed class EvidenceFileConfiguration : IEntityTypeConfiguration<Evide
 
         builder.Property(evidenceFile => evidenceFile.FailureReason)
             .HasMaxLength(EvidenceFile.MaximumFailureReasonLength);
+        builder.Property(evidenceFile => evidenceFile.PhysicalDeletedAt);
+        builder.Property(evidenceFile => evidenceFile.CleanupAttempts).IsRequired();
+        builder.Property(evidenceFile => evidenceFile.CleanupNextAttemptAt);
+        builder.Property<uint>("Version").IsRowVersion();
 
         builder.HasOne<EvidenceItem>()
             .WithOne(evidenceItem => evidenceItem.File)

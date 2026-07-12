@@ -26,6 +26,10 @@ internal sealed class UploadFileContentCommandHandler(
             return valid;
 
         EvidenceFile file = item!.File!;
+        if (item.IsRemoved)
+            return Result.Failure(EvidenceFileErrors.EvidenceItemRemoved);
+        if (file.UploadStatus != EvidenceFileUploadStatus.Pending)
+            return Result.Failure(EvidenceFileErrors.CannotStartVerification);
         if (file.UploadAttemptId.Value != request.UploadAttemptId)
             return Result.Failure(EvidenceFileErrors.UploadAttemptMismatch);
 

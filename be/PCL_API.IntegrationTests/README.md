@@ -83,7 +83,7 @@ The conceptual roles map to the current implementation as follows:
 
 Feature tests are grouped by capability and behavior. `Foundation` verifies the test environment itself; `TaskPlanning`, `Session`, and `Evidence` contain capability-focused scenarios; `Flows` verifies behavior spanning modules. New capabilities should follow the same feature-oriented organization.
 
-Current automated coverage includes the shared test foundation, all 32 mapped endpoints across Task Planning, Session, and Evidence, and the principal cross-module Task/Session/Evidence flows.
+Current automated coverage includes the shared test foundation, all 34 mapped endpoints across Task Planning, Session, and Evidence, and the principal cross-module Task/Session/Evidence flows.
 
 `IntegrationMessageProcessor` can explicitly run any configured module's outbox or inbox job. Flow tests compose the relevant module route and use bounded polling instead of waiting for the normal scheduler interval.
 

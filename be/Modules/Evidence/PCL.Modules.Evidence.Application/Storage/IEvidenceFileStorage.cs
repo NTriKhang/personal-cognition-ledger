@@ -34,6 +34,7 @@ public interface IEvidenceFileStorage
         string contentType,
         CancellationToken cancellationToken
     );
+    Task DeleteAsync(StorageProfile profile, string objectKey, CancellationToken cancellationToken);
 }
 
 public sealed record FileUploadTarget(

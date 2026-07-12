@@ -13,6 +13,8 @@ public sealed class EvidenceDbContext(DbContextOptions<EvidenceDbContext> option
 {
     public DbSet<EvidenceItem> EvidenceItems { get; set; } = null!;
     public DbSet<EvidenceFile> EvidenceFiles { get; set; } = null!;
+    public DbSet<EvidenceFileUploadAttempt> EvidenceFileUploadAttempts { get; set; } = null!;
+    public DbSet<EvidenceFileInitialization> EvidenceFileInitializations { get; set; } = null!;
     public DbSet<StorageProfile> StorageProfiles { get; set; } = null!;
     public DbSet<EvidenceStorageSettings> StorageSettings { get; set; } = null!;
 
@@ -24,6 +26,8 @@ public sealed class EvidenceDbContext(DbContextOptions<EvidenceDbContext> option
 
         modelBuilder.ApplyConfiguration(new EvidenceItemConfiguration());
         modelBuilder.ApplyConfiguration(new EvidenceFileConfiguration());
+        modelBuilder.ApplyConfiguration(new EvidenceFileUploadAttemptConfiguration());
+        modelBuilder.ApplyConfiguration(new EvidenceFileInitializationConfiguration());
         modelBuilder.ApplyConfiguration(new StorageProfileConfiguration());
         modelBuilder.ApplyConfiguration(
             new LocalStorageProfileConfigurationEntityConfiguration());

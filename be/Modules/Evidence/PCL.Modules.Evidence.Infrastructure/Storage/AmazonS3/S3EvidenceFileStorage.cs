@@ -110,6 +110,12 @@ internal sealed class S3EvidenceFileStorage : IEvidenceFileStorage
         return new(url, null);
     }
 
+    public async Task DeleteAsync(StorageProfile profile, string objectKey, CancellationToken ct)
+    {
+        using var client = Client(profile);
+        await client.DeleteObjectAsync(profile.S3Configuration!.BucketName, Key(profile, objectKey), ct);
+    }
+
     private static AmazonS3Client Client(StorageProfile profile) =>
         new(RegionEndpoint.GetBySystemName(profile.S3Configuration!.Region));
 

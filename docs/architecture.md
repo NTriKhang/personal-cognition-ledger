@@ -135,6 +135,8 @@ Provider-specific types remain in Infrastructure. Domain and Application code op
 
 FileReference Evidence uses the active storage profile through a provider-neutral Application contract. Local files stream through the API to a bounded temporary file before an atomic move; Amazon S3 uploads use short-lived presigned PUT requests. Provider metadata is verified before a file becomes Ready, and downloads are API streams for Local or short-lived presigned URLs for S3.
 
+Evidence runs bounded one-minute reconciliation and cleanup jobs. Reconciliation recovers uploads whose clients disconnected before confirmation; cleanup removes retained terminal or soft-removed file bytes after seven days. Provider calls occur outside the originating request transaction and are safe to retry.
+
 ## API host
 
 `be/PCL_API` is the composition root. It:

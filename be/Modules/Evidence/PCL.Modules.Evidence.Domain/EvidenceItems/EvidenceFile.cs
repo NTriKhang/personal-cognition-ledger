@@ -29,6 +29,9 @@ public sealed class EvidenceFile
     public DateTimeOffset StatusChangedAt { get; private set; }
     public DateTimeOffset? UploadedAt { get; private set; }
     public string? FailureReason { get; private set; }
+    public DateTimeOffset? PhysicalDeletedAt { get; private set; }
+    public int CleanupAttempts { get; private set; }
+    public DateTimeOffset? CleanupNextAttemptAt { get; private set; }
 
     private EvidenceFile()
     {
@@ -268,6 +271,60 @@ public sealed class EvidenceFile
         StatusChangedAt = cancelledAt;
 
         return Result.Success();
+    }
+
+    internal Result<EvidenceFileUploadAttempt> Renew(
+        EvidenceFileUploadAttemptId expectedAttemptId,
+        EvidenceFileUploadAttemptId newAttemptId,
+        StorageProfileId storageProfileId,
+        string objectKey,
+        DateTimeOffset createdAt,
+        DateTimeOffset expiresAt)
+    {
+        Result attemptResult = ValidateAttempt(expectedAttemptId);
+        if (attemptResult.IsFailure)
+            return Result.Failure<EvidenceFileUploadAttempt>(attemptResult.Error);
+
+        if (UploadStatus is not EvidenceFileUploadStatus.Expired and
+            not EvidenceFileUploadStatus.Failed)
+            return Result.Failure<EvidenceFileUploadAttempt>(EvidenceFileErrors.CannotRenew);
+
+        Result<EvidenceFile> replacement = CreatePending(
+            EvidenceItemId,
+            newAttemptId,
+            storageProfileId,
+            objectKey,
+            OriginalFileName,
+            ContentType,
+            FileSizeBytes,
+            ChecksumAlgorithm,
+            ChecksumValue,
+            createdAt,
+            expiresAt);
+        if (replacement.IsFailure)
+            return Result.Failure<EvidenceFileUploadAttempt>(replacement.Error);
+
+        EvidenceFileUploadAttempt archived = EvidenceFileUploadAttempt.Archive(this);
+        EvidenceFile next = replacement.Value;
+        UploadAttemptId = next.UploadAttemptId;
+        StorageProfileId = next.StorageProfileId;
+        ObjectKey = next.ObjectKey;
+        UploadStatus = next.UploadStatus;
+        CreatedAt = next.CreatedAt;
+        UploadExpiresAt = next.UploadExpiresAt;
+        StatusChangedAt = next.StatusChangedAt;
+        UploadedAt = null;
+        VersionId = null;
+        FailureReason = null;
+        PhysicalDeletedAt = null;
+        return Result.Success(archived);
+    }
+
+    public void MarkPhysicallyDeleted(DateTimeOffset deletedAt) => PhysicalDeletedAt ??= deletedAt;
+    public void MarkCleanupFailed(DateTimeOffset failedAt)
+    {
+        CleanupAttempts++;
+        CleanupNextAttemptAt = failedAt.AddMinutes(Math.Min(Math.Pow(2, CleanupAttempts - 1), 60));
     }
 
     private Result ValidateAttempt(EvidenceFileUploadAttemptId uploadAttemptId)

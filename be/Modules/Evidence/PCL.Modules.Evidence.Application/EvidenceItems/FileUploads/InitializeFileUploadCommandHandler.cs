@@ -6,6 +6,8 @@ using PCL.Modules.Evidence.Application.Storage;
 using PCL.Modules.Evidence.Domain.EvidenceItems;
 using PCL.Modules.Evidence.Domain.Storage;
 using PCL.Modules.Session.Contracts.LSessions;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace PCL.Modules.Evidence.Application.EvidenceItems.FileUploads;
 
@@ -23,6 +25,28 @@ internal sealed class InitializeFileUploadCommandHandler(
         CancellationToken ct
     )
     {
+        string requestHash = Hash(request);
+        EvidenceFileInitialization? prior = await itemRepository.GetInitializationAsync(request.OwnerId, request.IdempotencyKey, ct);
+        if (prior is not null)
+        {
+            if (prior.RequestHash != requestHash)
+                return Result.Failure<FileUploadReadModel>(EvidenceFileErrors.IdempotencyKeyConflict);
+            EvidenceItem? existing = await itemRepository.GetAsync(prior.EvidenceItemId, ct);
+            if (existing?.File is null)
+                return Result.Failure<FileUploadReadModel>(EvidenceFileErrors.NotFound);
+            if (existing.IsRemoved)
+                return Result.Failure<FileUploadReadModel>(EvidenceFileErrors.EvidenceItemRemoved);
+            StorageProfile? existingProfile = await profileRepository.GetAsync(existing.File.StorageProfileId, ct);
+            if (existingProfile is null)
+                return Result.Failure<FileUploadReadModel>(EvidenceFileErrors.StorageUnavailable);
+            FileUploadTarget existingTarget = existing.File.UploadStatus == EvidenceFileUploadStatus.Pending
+                ? await storageResolver.Resolve(existingProfile.ProviderType).CreateUploadTargetAsync(
+                    existingProfile, existing.File.ObjectKey, existing.File.ContentType, existing.File.FileSizeBytes,
+                    existing.File.ChecksumValue!, existing.File.UploadExpiresAt, ct)
+                : new("Complete", null, "", new Dictionary<string, string>());
+            return Result.Success(ToModel(existing, existingTarget));
+        }
+
         Result eligible = await eligibility.CheckAsync(request.SessionId, request.OwnerId, ct);
         if (eligible.IsFailure)
             return Result.Failure<FileUploadReadModel>(eligible.Error);
@@ -68,6 +92,7 @@ internal sealed class InitializeFileUploadCommandHandler(
             return Result.Failure<FileUploadReadModel>(initialized.Error);
 
         itemRepository.Add(item);
+        itemRepository.Add(EvidenceFileInitialization.Create(request.OwnerId, request.IdempotencyKey, requestHash, item.Id, request.AddedAt));
         await unitOfWork.SaveChangesAsync(ct);
         FileUploadTarget target = await storageResolver
             .Resolve(profile.ProviderType)
@@ -100,4 +125,11 @@ internal sealed class InitializeFileUploadCommandHandler(
             item.File.ChecksumAlgorithm!,
             item.File.ChecksumValue!
         );
+
+    private static string Hash(InitializeFileUploadCommand r)
+    {
+        string value = string.Join('\n', r.SessionId, r.Caption?.Trim() ?? "", r.OriginalFileName.Trim(),
+            r.ContentType.Trim().ToLowerInvariant(), r.FileSizeBytes, r.ChecksumAlgorithm.Trim().ToUpperInvariant(), r.ChecksumValue.Trim());
+        return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(value)));
+    }
 }

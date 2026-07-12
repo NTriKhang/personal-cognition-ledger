@@ -112,6 +112,15 @@ public static class EvidenceFileErrors
             "EvidenceFile.CannotCancel",
             "Only pending uploads can be cancelled.");
 
+    public static readonly Error CannotRenew =
+        Error.Conflict("EvidenceFile.CannotRenew", "Only expired or failed uploads can be renewed.");
+
+    public static readonly Error IdempotencyKeyRequired =
+        Error.Problem("EvidenceFile.IdempotencyKeyRequired", "An Idempotency-Key header is required.");
+
+    public static readonly Error IdempotencyKeyConflict =
+        Error.Conflict("EvidenceFile.IdempotencyKeyConflict", "The idempotency key was already used with different initialization data.");
+
     public static readonly Error InvalidStatusChangeTime =
         Error.Problem(
             "EvidenceFile.InvalidStatusChangeTime",

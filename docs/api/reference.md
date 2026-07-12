@@ -263,6 +263,8 @@ Evidence owns Session Evidence and deployment-level storage profiles.
 | PUT | `/lsessions/{sessionId}/evidence-items/{evidenceItemId}/file-upload/content` | Upload Local file bytes | `204` |
 | POST | `/lsessions/{sessionId}/evidence-items/{evidenceItemId}/file-upload/confirm` | Verify an upload | `200` |
 | GET | `/lsessions/{sessionId}/evidence-items/{evidenceItemId}/file-upload` | Get upload status | `200` |
+| POST | `/lsessions/{sessionId}/evidence-items/{evidenceItemId}/file-upload/renew` | Renew an expired or failed upload | `200` |
+| DELETE | `/lsessions/{sessionId}/evidence-items/{evidenceItemId}/file-upload` | Cancel a pending upload | `200` |
 | GET | `/lsessions/{sessionId}/evidence-items/{evidenceItemId}/file` | Download a Ready file | `200` or `302` |
 | POST | `/admin/evidence-storage/profiles/local` | Create and verify Local profile | `201`, profile ID |
 | POST | `/admin/evidence-storage/profiles/amazon-s3` | Create and verify S3 profile | `201`, profile ID |
@@ -288,7 +290,10 @@ Evidence owns Session Evidence and deployment-level storage profiles.
 - Note content is required and limited to 10,000 characters.
 - Link content is required, limited to 2,048 characters, and must be absolute HTTP/HTTPS.
 - Generic FileReference creation returns `EvidenceItem.FileReferenceRequiresUploadInitialization`.
-- Initialize FileReference Evidence with `ownerId`, optional `caption`, `originalFileName`, allowed `contentType`, `fileSizeBytes` (maximum 25 MiB), and a Base64 SHA-256 checksum. Local profiles return an `ApiProxy` PUT URL; Amazon S3 returns a `Direct` presigned PUT URL and required headers. Confirmation verifies provider size, content type, and checksum before status becomes `Ready`.
+- Initialize FileReference Evidence with a required `Idempotency-Key` header plus `ownerId`, optional `caption`, `originalFileName`, allowed `contentType`, `fileSizeBytes` (maximum 25 MiB), and a Base64 SHA-256 checksum. Keys are scoped to the owner: an exact replay returns the existing reservation, while different input returns `EvidenceFile.IdempotencyKeyConflict`.
+- Local profiles return an `ApiProxy` PUT URL; Amazon S3 returns a `Direct` presigned PUT URL and required headers. Confirmation verifies provider size, content type, and checksum before status becomes `Ready`.
+- An `Expired` or `Failed` upload can be renewed with its current attempt ID. Renewal retains the EvidenceItem, archives the old storage identity for cleanup, and returns a fresh attempt ID, object identity, and 15-minute target. Pending uploads can be explicitly cancelled; cancellation is idempotent.
+- A one-minute reconciliation job performs a final provider metadata check for expired Pending attempts and marks matching content Ready or the reservation Expired. Terminal and removed-file bytes are deleted asynchronously after seven days.
 - The current `Location` header incorrectly includes `/api`.
 
 `GET /lsessions/{sessionId}/evidence-items?ownerId={ownerId}&includeRemoved=false`

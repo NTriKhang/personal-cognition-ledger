@@ -132,6 +132,13 @@ internal sealed class LocalEvidenceFileStorage : IEvidenceFileStorage
             )
         );
 
+    public Task DeleteAsync(StorageProfile profile, string objectKey, CancellationToken cancellationToken)
+    {
+        string path = GetPath(profile, objectKey);
+        if (File.Exists(path)) File.Delete(path);
+        return Task.CompletedTask;
+    }
+
     private static string GetPath(StorageProfile profile, string objectKey)
     {
         string root = Path.GetFullPath(profile.LocalConfiguration!.RootDirectory);

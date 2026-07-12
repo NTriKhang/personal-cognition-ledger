@@ -1,8 +1,11 @@
 # Evidence file uploads
 
-Status: Approved; implementation not started  
-Last reviewed: 2026-07-11  
-Owning module: Evidence  
+Status: Implemented; retained until authentication prerequisite is resolved
+
+Last reviewed: 2026-07-12
+
+Owning module: Evidence
+
 Depends on: implemented storage profiles; Session eligibility contract; an explicit decision about authentication exposure
 
 ## Scope

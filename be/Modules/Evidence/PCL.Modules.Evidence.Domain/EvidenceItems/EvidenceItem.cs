@@ -201,6 +201,17 @@ public sealed class EvidenceItem : Entity
             ? Result.Failure(EvidenceFileErrors.NotAttached)
             : File.Cancel(uploadAttemptId, cancelledAt);
 
+    public Result<EvidenceFileUploadAttempt> RenewFileUpload(
+        EvidenceFileUploadAttemptId expectedAttemptId,
+        EvidenceFileUploadAttemptId newAttemptId,
+        StorageProfileId storageProfileId,
+        string objectKey,
+        DateTimeOffset renewedAt,
+        DateTimeOffset expiresAt) =>
+        File is null
+            ? Result.Failure<EvidenceFileUploadAttempt>(EvidenceFileErrors.NotAttached)
+            : File.Renew(expectedAttemptId, newAttemptId, storageProfileId, objectKey, renewedAt, expiresAt);
+
     private static EvidenceItem Create(
         Guid sessionId,
         Guid ownerId,

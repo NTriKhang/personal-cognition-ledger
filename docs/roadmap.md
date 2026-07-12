@@ -14,23 +14,22 @@ Implemented and covered by HTTP integration tests:
 - asynchronous activation of assigned Planned Tasks
 - Note and Link Evidence, listing, and soft removal
 - Local and Amazon S3 storage-profile creation, verification, selection, and settings
-- all 32 mapped endpoints and principal cross-module flows
+- all 34 mapped endpoints and principal cross-module flows
 
 Known baseline limitations:
 
 - authentication and authorization are disabled
 - some created-response `Location` headers incorrectly include `/api`
 - Session reads are not owner-filtered
-- storage profiles are configurable, but no file-upload or download endpoints are mapped
 - no frontend exists
 
 ## Current priority
 
 ### Evidence file workflow
 
-Status: approved design, not implemented
+Status: implemented; production identity hardening remains
 
-The core FileReference workflow is implemented: reservation, Local API streaming or S3 direct upload, provider verification, status, and authorized download. Remaining work is interrupted-upload reconciliation, renewal/cancellation, and retention-based physical cleanup.
+The FileReference workflow is implemented: idempotent reservation, Local API streaming or S3 direct upload, provider verification, status, download, renewal/cancellation, interrupted-upload reconciliation, and seven-day retention-based physical cleanup.
 
 Security identity must be addressed before file endpoints are considered production-ready. Until authentication exists, any implementation must remain explicitly development-only or carry the current security warning.
 

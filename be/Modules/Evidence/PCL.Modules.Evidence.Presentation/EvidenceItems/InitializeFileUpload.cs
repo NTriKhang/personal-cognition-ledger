@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using PCL.Modules.Evidence.Application.EvidenceItems.FileUploads;
+using PCL.Modules.Evidence.Domain.EvidenceItems;
 
 namespace PCL.Modules.Evidence.Presentation.EvidenceItems;
 
@@ -15,8 +16,11 @@ internal sealed class InitializeFileUpload : IEndpoint
     {
         app.MapPost(
                 "lsessions/{sessionId:guid}/evidence-items/file-uploads",
-                async (Guid sessionId, Request request, ISender sender) =>
+                async (Guid sessionId, Request request, HttpRequest httpRequest, ISender sender) =>
                 {
+                    string key = httpRequest.Headers["Idempotency-Key"].ToString().Trim();
+                    if (string.IsNullOrEmpty(key) || key.Length > 200)
+                        return ApiResults.Problem(Result.Failure(EvidenceFileErrors.IdempotencyKeyRequired));
                     Result<FileUploadReadModel> result = await sender.Send(
                         new InitializeFileUploadCommand(
                             sessionId,
@@ -27,6 +31,7 @@ internal sealed class InitializeFileUpload : IEndpoint
                             request.FileSizeBytes,
                             request.ChecksumAlgorithm,
                             request.ChecksumValue,
+                            key,
                             DateTimeOffset.UtcNow
                         )
                     );

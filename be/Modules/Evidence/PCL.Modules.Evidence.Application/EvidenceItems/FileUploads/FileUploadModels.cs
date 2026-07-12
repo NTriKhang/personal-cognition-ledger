@@ -31,6 +31,8 @@ internal static class FileUploadGuard
     {
         if (item?.File is null)
             return Common.Domain.Result.Failure(EvidenceFileErrors.NotFound);
+        if (item.IsRemoved)
+            return Common.Domain.Result.Failure(EvidenceFileErrors.EvidenceItemRemoved);
         if (item.SessionId != sessionId)
             return Common.Domain.Result.Failure(EvidenceFileErrors.SessionMismatch);
         if (item.OwnerId != ownerId)

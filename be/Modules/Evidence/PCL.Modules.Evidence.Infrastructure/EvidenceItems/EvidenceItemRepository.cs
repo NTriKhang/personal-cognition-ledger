@@ -12,6 +12,13 @@ public sealed class EvidenceItemRepository(EvidenceDbContext context) : IEvidenc
         context.EvidenceItems.Add(evidenceItem);
     }
 
+    public void Add(EvidenceFileUploadAttempt attempt) => context.EvidenceFileUploadAttempts.Add(attempt);
+    public void Add(EvidenceFileInitialization initialization) => context.EvidenceFileInitializations.Add(initialization);
+    public Task<EvidenceFileInitialization?> GetInitializationAsync(Guid ownerId, string idempotencyKey, CancellationToken cancellationToken = default) =>
+        context.EvidenceFileInitializations.SingleOrDefaultAsync(x => x.OwnerId == ownerId && x.IdempotencyKey == idempotencyKey, cancellationToken);
+    public Task<EvidenceFileUploadAttempt?> GetAttemptAsync(EvidenceFileUploadAttemptId attemptId, CancellationToken cancellationToken = default) =>
+        context.EvidenceFileUploadAttempts.SingleOrDefaultAsync(x => x.Id == attemptId, cancellationToken);
+
     public async Task<EvidenceItem?> GetAsync(
         EvidenceItemId evidenceItemId,
         CancellationToken cancellationToken = default)

@@ -149,9 +149,13 @@ stateDiagram-v2
     Verifying --> Failed
     Pending --> Expired
     Pending --> Cancelled
+    Expired --> Pending: renew with new attempt
+    Failed --> Pending: renew with new attempt
 ```
 
-The model records expected file metadata, checksum, the selected storage-profile identity, expiry, upload time, version, and failure information. Current domain limits include a 25 MiB maximum, an allowed content-type policy, and a required Base64 SHA-256 checksum. Provider metadata verification is required before Ready.
+The model records expected file metadata, checksum, the selected storage-profile identity, expiry, upload time, version, and failure information. Renewal preserves the logical EvidenceFile while archiving the previous attempt and assigning a fresh attempt and object identity. Current domain limits include a 25 MiB maximum, an allowed content-type policy, and a required Base64 SHA-256 checksum. Provider metadata verification is required before Ready.
+
+Initialization retries are owner-scoped by an idempotency key. Expired Pending uploads are reconciled against provider metadata. Bytes associated with expired, failed, cancelled, superseded, or removed Evidence are retained for seven days and then deleted asynchronously and idempotently.
 
 ### StorageProfile responsibility
 

@@ -11,5 +11,6 @@ public sealed record InitializeFileUploadCommand(
     long FileSizeBytes,
     string ChecksumAlgorithm,
     string ChecksumValue,
+    string IdempotencyKey,
     DateTimeOffset AddedAt
 ) : ICommand<FileUploadReadModel>;

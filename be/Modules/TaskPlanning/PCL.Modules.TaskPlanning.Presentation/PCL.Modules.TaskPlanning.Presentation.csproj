@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Common\Common.Presentation\Common.Presentation.csproj" />
+    <ProjectReference Include="..\..\Session\PCL.Modules.Session.Contracts\PCL.Modules.Session.Contracts.csproj" />
+    <ProjectReference Include="..\PCL.Modules.TaskPlanning.Application\PCL.Modules.TaskPlanning.Application.csproj" />
+  </ItemGroup>
+
+</Project>

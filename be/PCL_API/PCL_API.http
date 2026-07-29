@@ -1,0 +1,11 @@
+# The complete manual API collection is maintained under:
+# ../../docs/api/requests/
+#
+# Start with:
+# ../../docs/api/reference.md
+
+@baseUrl = http://localhost:5266
+
+### Basic API availability check
+GET {{baseUrl}}/lsessions
+Accept: application/json

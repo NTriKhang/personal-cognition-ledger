@@ -1,0 +1,114 @@
+@baseUrl = http://localhost:5266
+@ownerId = 11111111-1111-1111-1111-111111111111
+@otherOwnerId = 99999999-9999-9999-9999-999999999999
+@taskId = replace-with-task-id
+
+### Draft task
+POST {{baseUrl}}/tasks/draft
+Content-Type: application/json
+
+{
+  "ownerId": "{{ownerId}}",
+  "title": "Document the API",
+  "description": "Manually verify current endpoint behavior",
+  "createdAt": null
+}
+
+### List all owner tasks
+GET {{baseUrl}}/tasks?ownerId={{ownerId}}
+Accept: application/json
+
+### List with filters (enum values are numeric)
+GET {{baseUrl}}/tasks?ownerId={{ownerId}}&status=1&category=6&priority=2&search=API
+Accept: application/json
+
+### List assignable tasks
+GET {{baseUrl}}/tasks/assignable?ownerId={{ownerId}}
+Accept: application/json
+
+### Get task
+GET {{baseUrl}}/tasks/{{taskId}}?ownerId={{ownerId}}
+Accept: application/json
+
+### Ownership check - expect 404
+GET {{baseUrl}}/tasks/{{taskId}}?ownerId={{otherOwnerId}}
+Accept: application/json
+
+### Refine
+PUT {{baseUrl}}/tasks/{{taskId}}/details
+Content-Type: application/json
+
+{
+  "ownerId": "{{ownerId}}",
+  "title": "Document and manually verify the API",
+  "description": "Keep documentation aligned with code",
+  "updatedAt": null
+}
+
+### Categorize as Writing (6)
+PUT {{baseUrl}}/tasks/{{taskId}}/category
+Content-Type: application/json
+
+{
+  "ownerId": "{{ownerId}}",
+  "category": 6,
+  "updatedAt": null
+}
+
+### Prioritize as High (2)
+PUT {{baseUrl}}/tasks/{{taskId}}/priority
+Content-Type: application/json
+
+{
+  "ownerId": "{{ownerId}}",
+  "priority": 2,
+  "updatedAt": null
+}
+
+### Plan
+POST {{baseUrl}}/tasks/{{taskId}}/plan
+Content-Type: application/json
+
+{
+  "ownerId": "{{ownerId}}",
+  "plannedAt": null
+}
+
+### Activate
+POST {{baseUrl}}/tasks/{{taskId}}/activate
+Content-Type: application/json
+
+{
+  "ownerId": "{{ownerId}}",
+  "activatedAt": null
+}
+
+### Defer
+POST {{baseUrl}}/tasks/{{taskId}}/defer
+Content-Type: application/json
+
+{
+  "ownerId": "{{ownerId}}",
+  "deferredAt": null
+}
+
+### Complete
+POST {{baseUrl}}/tasks/{{taskId}}/complete
+Content-Type: application/json
+
+{
+  "ownerId": "{{ownerId}}",
+  "completedAt": null,
+  "completionNote": "Manual API documentation completed."
+}
+
+### Cancel (use a separate non-terminal task)
+POST {{baseUrl}}/tasks/{{taskId}}/cancel
+Content-Type: application/json
+
+{
+  "ownerId": "{{ownerId}}",
+  "cancelledAt": null,
+  "cancellationReason": "No longer required."
+}
+

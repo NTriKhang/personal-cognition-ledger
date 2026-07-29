@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Common\Common.Application\Common.Application.csproj" />
+    <ProjectReference Include="..\PCL.Modules.Session.Contracts\PCL.Modules.Session.Contracts.csproj" />
+    <ProjectReference Include="..\..\TaskPlanning\PCL.Modules.TaskPlanning.Contracts\PCL.Modules.TaskPlanning.Contracts.csproj" />
+    <ProjectReference Include="..\PCL.Modules.Session.Domain\PCL.Modules.Session.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
